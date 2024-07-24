@@ -7,6 +7,7 @@ venv:
 
 deps:
 	pip install -r requirements.txt
+	pip install -r requirements-dev.txt
 
 db: 
 	docker run -d --name dev_xlock_db -e POSTGRES_USER=dev_user -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=dev_xlock -p 5432:5432 postgres:16.3-alpine3.20
@@ -41,4 +42,4 @@ migrate-all:
 migrate-downgrade:
 	PYTHONPATH=./ alembic downgrade -1
 
-dev: deps db core
+dev: deps db

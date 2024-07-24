@@ -27,8 +27,8 @@ clean-core:
 	docker rm xlock-core
 
 clean-all: 
-	clean-core
-	clean-db clean-redis
+	$(MAKE) clean-db
+	$(MAKE) clean-core
 
 migrate-new:
 	@echo "Enter migration message: "; \
@@ -41,4 +41,4 @@ migrate-all:
 migrate-downgrade:
 	PYTHONPATH=./ alembic downgrade -1
 
-dev: deps db 
+dev: deps db core

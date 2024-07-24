@@ -15,23 +15,38 @@ redis_pool: redis.ConnectionPool = redis.ConnectionPool(
 )
 
 
-class Storage:
-    @staticmethod
-    def get_db():
-        db = SessionLocal()
-        try:
-            yield db
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
-        finally:
-            db.close()
+class BaseRepository:
+    def __init__(self):
+        self.db = None
+        self.redis = None
 
-    @staticmethod
-    def get_redis():
-        r = redis.Redis(connection_pool=redis_pool)
-        try:
-            yield r
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
-        finally:
-            pass
+    def get_db(self):
+        if self.db is None:
+            self.db = SessionLocal()
+        return self.db
+
+    def get_redis(self):
+        if self.redis is None:
+            self.redis = redis.Redis(connection_pool=redis_pool)
+        return self.redis
+
+    def close_db(self):
+        if self.db is not None:
+            self.db.close()
+            self.db = None
+
+    def close_redis(self):
+        if self.redis is not None:
+            self.redis.close()
+            self.redis = None
+
+    def __enter__(self):
+        self.db = self.get_db()
+        self.redis = self.get_redis()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close_db()
+        self.close_redis()
+        if exc_type is not None:
+            raise HTTPException(status_code=500, detail=str(exc_val))

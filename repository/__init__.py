@@ -17,7 +17,7 @@ redis_pool: redis.ConnectionPool = redis.ConnectionPool(
 
 class Storage:
     @staticmethod
-    def get():
+    def get_db():
         db = SessionLocal()
         try:
             yield db
@@ -26,10 +26,8 @@ class Storage:
         finally:
             db.close()
 
-
-class RedisStorage:
     @staticmethod
-    def get():
+    def get_redis():
         r = redis.Redis(connection_pool=redis_pool)
         try:
             yield r

@@ -56,19 +56,3 @@ app.dependency_overrides[RedisStorage.get] = override_get_redis
 app.dependency_overrides[Storage.get] = override_get_db
 
 client = TestClient(app)
-
-
-class TestIntegration(TestCase):
-    def __init__(self, methodName: str = "runTest") -> None:
-        super().__init__(methodName)
-        self._s = requests.session()
-        self._base = "http://localhost:8000/api"
-        self._route = None
-        self._access_token = self._s.post(
-            self._base + "/auth/login",
-            json={"email": "admin@email.com", "password": "admin123"},
-        ).json()["data"]["access_token"]
-        self._s.headers = {"Authorization": f"Bearer {self._access_token}"}
-
-    def path(self, path):
-        return self._base + self._route + path

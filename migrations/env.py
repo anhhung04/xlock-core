@@ -23,8 +23,15 @@ if config.config_file_name is not None:
 
 config.set_main_option(
     "sqlalchemy.url",
-    f"postgresql://{os.getenv('POSTGRES_USER', 'dev_user')}:{os.getenv('POSTGRES_PASSWORD', 'secret')}@{os.getenv('POSTGRES_HOST', 'localhost')}:{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'dev_xlock')}",
+    (
+        f"postgresql://{os.getenv('POSTGRES_USER', 'dev_user')}:"
+        f"{os.getenv('POSTGRES_PASSWORD', 'secret')}@"
+        f"{os.getenv('POSTGRES_HOST', 'localhost')}:"
+        f"{os.getenv('POSTGRES_PORT', '5432')}/"
+        f"{os.getenv('POSTGRES_DB', 'dev_xlock')}"
+    ),
 )
+
 
 # add your model's MetaData object here
 # for 'autogenerate' support
@@ -76,7 +83,10 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata
+        )
 
         with context.begin_transaction():
             context.run_migrations()

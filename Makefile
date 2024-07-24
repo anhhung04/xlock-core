@@ -41,5 +41,4 @@ migrate-all:
 migrate-downgrade:
 	PYTHONPATH=./ alembic downgrade -1
 
-dev:
-	deps db 
+dev: deps db 

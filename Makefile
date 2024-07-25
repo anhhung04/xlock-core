@@ -1,8 +1,7 @@
 .PHONY: venv deps db clean dev core clean-db clean-core clean-all migrate-new migrate-all migrate-downgrade
 
 venv:
-	pip install virtualenv
-	python3 -m virtualenv .venv
+	python -m venv .venv
 
 deps: venv
 	pip install -r requirements.txt

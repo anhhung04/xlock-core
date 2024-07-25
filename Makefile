@@ -1,24 +1,12 @@
 .PHONY: venv deps db clean dev core clean-db clean-core clean-all migrate-new migrate-all migrate-downgrade
 
-# Detect the operating system
-UNAME_S := $(shell uname -s)
-
 venv:
-ifeq ($(OS),Windows_NT)
-	pip install virtualenv
-	python -m virtualenv .venv
-	.venv\Scripts\activate
-else
 	pip install virtualenv
 	python3 -m virtualenv .venv
-	.venv/bin/activate
-endif
 
 deps: venv
-
 	pip install -r requirements.txt
 	pip install -r requirements-dev.txt
-
 
 db: 
 	docker run -d --name dev_xlock_db -e POSTGRES_USER=dev_user -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=dev_xlock -p 5432:5432 postgres:16.3-alpine3.20

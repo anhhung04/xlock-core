@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 
 class APIResponse:
     @staticmethod
-    def as_json(status_code: int, message: str, data: dict = None):
+    def as_json(status_code: int, message: str, data: dict | None = None):
         content = {
             "code": status_code,
             "status": message,

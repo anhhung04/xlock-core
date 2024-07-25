@@ -1,1 +1,46 @@
+x-postgres-env: &postgres-env
+  POSTGRES_USER: ${POSTGRES_USER:-postgres}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+  POSTGRES_DB: ${POSTGRES_DB:-postgres}
 
+services:
+  app:
+    build: .
+    ports:
+      - "${PORT:-8000}:${PORT:-8000}"
+    environment:
+      <<: *postgres-env
+      REDIS_URL: redis://redis6379
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      PORT: ${PORT:-8000}
+    profiles:
+      - prod
+  postgres:
+    image: postgres:13
+    environment:
+      <<: *postgres-env
+    ports:
+      - "${POSTGRES_PORT:-5432}:${POSTGRES_PORT:-5432}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    profiles:
+      - prod
+  postgres-dev:
+    image: postgres:13
+    environment:
+      <<: *postgres-env
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    profiles:
+      - dev
+  redis:
+    image: redis:6
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    profiles:
+      - prod
+      - dev
+
+volumes:
+  postgres_data:

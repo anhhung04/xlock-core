@@ -4,11 +4,12 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 config = {
-    "PORT": 8000,
+    "PORT": os.getenv("PORT", 8000),
     "HOST": "0.0.0.0",
     "workers": 4,
     "PROD": os.getenv("PROD", None),
     "ALLOWED_HOSTS": ["*"],
+    "ALLOWED_METHODS": ["*"],
     "POSTGRES_SQL_URL": (
         f"postgresql://{os.getenv('POSTGRES_USER', 'dev_user')}:"
         f"{os.getenv('POSTGRES_PASSWORD', 'secret')}@"

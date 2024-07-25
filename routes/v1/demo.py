@@ -12,5 +12,5 @@ async def demo(
     demo_service: DemoService = Depends(DemoService),
 ):
     logger.info("Demo router")
-    demo_service.demo()
+    await demo_service.demo()
     return APIResponse.as_json(200, "OK!", "Hello, world!")

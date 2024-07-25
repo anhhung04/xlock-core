@@ -1,52 +1,43 @@
-import redis
 from config import config
+from redis import ConnectionPool, Redis
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from fastapi import HTTPException
+from sqlalchemy.orm import sessionmaker, Session
+from fastapi import Depends
 
 engine = create_engine(config["POSTGRES_SQL_URL"])
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-redis_pool: redis.ConnectionPool = redis.ConnectionPool(
+redis_pool: ConnectionPool = ConnectionPool(
     host=config["REDIS_HOST"],
     port=int(config["REDIS_PORT"]),
     max_connections=config["MAX_CONNECTIONS_REDIS"],
-    db=0,
+)
+
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine,
 )
 
 
-class BaseRepository:
-    def __init__(self):
-        self.db = None
-        self.redis = None
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
-    def get_db(self):
-        if self.db is None:
-            self.db = SessionLocal()
-        return self.db
 
-    def get_redis(self):
-        if self.redis is None:
-            self.redis = redis.Redis(connection_pool=redis_pool)
-        return self.redis
+def get_store():
+    redis = Redis(connection_pool=redis_pool)
+    try:
+        yield redis
+    finally:
+        redis.close()
 
-    def close_db(self):
-        if self.db is not None:
-            self.db.close()
-            self.db = None
 
-    def close_redis(self):
-        if self.redis is not None:
-            self.redis.close()
-            self.redis = None
+class Storage:
 
-    def __enter__(self):
-        self.db = self.get_db()
-        self.redis = self.get_redis()
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close_db()
-        self.close_redis()
-        if exc_type is not None:
-            raise HTTPException(status_code=500, detail=str(exc_val))
+    def __init__(
+        self, db: Session = Depends(get_db), redis: Redis = Depends(get_store)
+    ):
+        self._fstore: Redis = redis
+        self._db: Session = db

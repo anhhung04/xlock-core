@@ -28,21 +28,18 @@ jobs:
             - name: Generate Test Report
               id: generate_report
               run: |
-                  if pytest > output.txt 2>&1; then
-                    echo "Tests passed. Generating report..."
-                  else
-                    exit_code=$?
-                    if [ $exit_code -eq 5 ]; then
-                        echo "Exit code indicates success. Continuing..."
-                        echo "result=success" >> $GITHUB_OUTPUT
-                    else
-                        echo "::error::Tests failed. Exiting..."
-                        echo "result=error" >> $GITHUB_OUTPUT
-                        exit $exit_code
-                    fi
-                  fi
-                  # Generate report
+                  pytest > output.txt 2>&1;
+                  exit_code=$?
                   echo "report=$(<output.txt)" >> $GITHUB_OUTPUT
+                  # Generate report
+                  if [ $exit_code -eq 5 || $exit_code -eq 0  ]; then
+                    echo "Exit code indicates success. Continuing..."
+                    echo "::set-output name=result::success"
+                  else
+                    echo "::error::Tests failed. Exiting..."
+                    echo "::set-output name=result::error"
+                    exit $exit_code
+                  fi
 
             - name: Send Report via Webhook
               uses: rjstone/discord-webhook-notify@v1.1.1

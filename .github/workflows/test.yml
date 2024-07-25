@@ -28,19 +28,20 @@ jobs:
             - name: Generate Test Report
               id: generate_report
               run: |
-                  pytest > output.txt
+                  if pytest > output.txt 2>&1; then
+                    echo "Tests passed. Generating report..."
+                  else
+                    exit_code=$?
+                    if [ $exit_code -eq 5 ]; then
+                        echo "Exit code indicates success. Continuing..."
+                    else
+                        echo "::error::Unexpected exit code: $exit_code. Failing the action."
+                        exit $exit_code
+                    fi
+                  fi
+                  # Generate report
                   echo "::set-output name=report::$(cat output.txt)"
 
-            - name: Check Exit Code and Set Output
-              if: always()
-              run: |
-                  exit_code=$?
-                  if [ $exit_code -eq 5 ] || [ $exit_code -eq 0 ]; then
-                    echo "Exit code indicates success. Continuing..."
-                  else
-                    echo "::error::Unexpected exit code: $exit_code. Failing the action."
-                    exit $exit_code
-                  fi
             - name: Send Report via Webhook
               uses: rjstone/discord-webhook-notify@v1.1.1
               if: failure() # Send report even if tests fail

@@ -15,7 +15,7 @@ permissions:
 jobs:
     build:
         runs-on: ubuntu-latest
-        # if: github.event.pull_request.merged
+        if: github.event.pull_request.merged
         steps:
             - name: Get Next Version
               id: semver

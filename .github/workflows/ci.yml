@@ -15,15 +15,14 @@ permissions:
 jobs:
     build:
         runs-on: ubuntu-latest
-        if: github.event.pull_request.merged
+        # if: github.event.pull_request.merged
         steps:
-            - name: Tag
-              id: tag
-              uses: K-Phoen/semver-release-action@master
+            - name: Get Next Version
+              id: semver
+              uses: ietf-tools/semver-action@v1
               with:
-                  release_branch: main
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  branch: main
 
             - name: Set up QEMU
               uses: docker/setup-qemu-action@v3
@@ -42,7 +41,7 @@ jobs:
               uses: docker/build-push-action@v6
               with:
                   push: true
-                  tags: ${{ env.IMAGE_PREFIX }}:${{ steps.tag.outputs.tag }}
+                  tags: ghcr.io/${{ env.IMAGE_PREFIX }}:${{ steps.semver.outputs.next }}
 
     deploy:
         runs-on: ubuntu-latest

@@ -33,7 +33,7 @@ clean-all:
 migrate-new:
 	@echo "Enter migration message: "; \
 	read message; \
-	alembic revision -m "$$message"
+	alembic revision --autogenerate -m "$$message"
 
 migrate-all:
 	PYTHONPATH=./ alembic upgrade head

@@ -20,18 +20,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-for subdir in ["api", "public"]:
-    path = os.path.join("./routes", subdir)
-    if not os.path.isdir(path):
-        continue
-    for route in os.listdir(path):
-        if route.startswith("_") or not route.endswith(".py"):
+
+def generate_imports():
+    base_path = "./routes"
+    subdirs = ["api", "public"]
+    imports = []
+
+    for subdir in subdirs:
+        path = os.path.join(base_path, subdir)
+        if not os.path.isdir(path):
             continue
-        module_name = route.removesuffix(".py")
-        module = __import__(f"routes.{subdir}.{module_name}", fromlist=[module_name])
-        app.include_router(
-            module.router, prefix=f"/{subdir}/{module_name}", tags=[module_name]
-        )
+        for route in os.listdir(path):
+            if route.startswith("_") or not route.endswith(".py"):
+                continue
+            module_name = route.removesuffix(".py")
+            import_statement = f"from routes.{subdir} import {module_name}"
+            imports.append(import_statement)
+
+    return imports
+
+
+imports = generate_imports()
+for imp in imports:
+    print(imp)
 
 
 @app.exception_handler(HTTPException)

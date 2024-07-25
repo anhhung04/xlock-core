@@ -1,4 +1,5 @@
 from fastapi import Depends
+from utils.log import logger
 
 from repository.demo import DemoRepo
 
@@ -11,5 +12,5 @@ class DemoService:
         self._demo_repo = demo_repo
 
     def demo(self):
-        print("DemoService")
+        logger.info("Demo service")
         return self._demo_repo.demo()

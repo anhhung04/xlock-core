@@ -2,10 +2,9 @@
 
 venv:
 	pip install virtualenv
-	python -m virtualenv .venv
-	source .venv/bin/activate
+	python3 -m virtualenv .venv
 
-deps:
+deps: venv
 	pip install -r requirements.txt
 	pip install -r requirements-dev.txt
 
@@ -15,7 +14,7 @@ db:
 
 core:
 	docker build -t xlock-core -f ./Dockerfile .
-	docker run -p 8000:8000 -p8888:8888 --name xlock-core --link dev_xlock_db:database --link dev_xlock_redis:redis -d xlock-core
+	docker run -p 8000:8000 -p 8888:8888 --name xlock-core --link dev_xlock_db:database --link dev_xlock_redis:redis -d xlock-core
 
 clean-db:
 	docker stop dev_xlock_db
@@ -43,3 +42,6 @@ migrate-downgrade:
 	PYTHONPATH=./ alembic downgrade -1
 
 dev: deps db
+
+
+

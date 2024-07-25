@@ -54,8 +54,6 @@ migrate-downgrade:
 	PYTHONPATH=./ alembic downgrade -1
 
 dev: deps db
-ifeq ($(OS),Windows_NT)
-	uvicorn app.main:app --reload
-else
-	uvicorn app.main:app --reload
-endif
+
+
+

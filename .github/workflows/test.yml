@@ -36,6 +36,7 @@ jobs:
                         echo "Exit code indicates success. Continuing..."
                         echo "result=success" >> $GITHUB_OUTPUT
                     else
+                        echo "::error::Tests failed. Exiting..."
                         echo "result=error" >> $GITHUB_OUTPUT
                         exit $exit_code
                     fi
@@ -49,7 +50,7 @@ jobs:
               with:
                   username: xlock-core test reporter
                   webhookUrl: ${{ secrets.DISCORD_WEBHOOK_URL }}
-                  text: "Test Results for branch ${{ github.ref_name }} on ${{ github.repository }}"
+                  text: "Test Results for ${{ github.ref }} on ${{ github.repository }}"
                   description: |
                       ```console
                           ${{ steps.generate_report.outputs.report }}

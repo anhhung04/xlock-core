@@ -7,19 +7,18 @@ venv:
 ifeq ($(OS),Windows_NT)
 	pip install virtualenv
 	python -m virtualenv .venv
+	.venv\Scripts\activate
 else
 	pip install virtualenv
 	python3 -m virtualenv .venv
+	.venv/bin/activate
 endif
 
 deps: venv
-ifeq ($(OS),Windows_NT)
-	.venv\Scripts\activate && pip install -r requirements.txt
-	.venv\Scripts\activate && pip install -r requirements-dev.txt
-else
-	.venv/bin/activate && pip install -r requirements.txt
-	.venv/bin/activate && pip install -r requirements-dev.txt
-endif
+
+	pip install -r requirements.txt
+	pip install -r requirements-dev.txt
+
 
 db: 
 	docker run -d --name dev_xlock_db -e POSTGRES_USER=dev_user -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=dev_xlock -p 5432:5432 postgres:16.3-alpine3.20
@@ -56,7 +55,7 @@ migrate-downgrade:
 
 dev: deps db
 ifeq ($(OS),Windows_NT)
-	.venv\Scripts\activate && uvicorn app.main:app --reload
+	uvicorn app.main:app --reload
 else
-	.venv/bin/activate && uvicorn app.main:app --reload
+	uvicorn app.main:app --reload
 endif

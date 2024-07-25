@@ -4,7 +4,7 @@ venv:
 	pip install virtualenv
 	python3 -m virtualenv .venv
 
-deps: venv
+deps: 
 	pip install -r requirements.txt
 	pip install -r requirements-dev.txt
 

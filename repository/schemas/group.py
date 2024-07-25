@@ -6,7 +6,7 @@ from sqlalchemy import ForeignKey
 
 from typing import Optional, List
 
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from datetime import datetime, timezone
 
@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 class Group(Base):
     __tablename__ = "groups"
 
-    id: Mapped[UUID] = mapped_column(primary_key=True)
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     name: Mapped[str] = mapped_column()
     description: Mapped[Optional[str]] = mapped_column()
     created_time: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))

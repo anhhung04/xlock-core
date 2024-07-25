@@ -6,7 +6,7 @@ from sqlalchemy import ForeignKey, UniqueConstraint, Enum as DBEnum
 
 from typing import Optional, List
 
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from datetime import datetime, timezone
 
@@ -14,14 +14,14 @@ from enum import Enum
 
 
 class Status(Enum):
-    SUCCESS = "Seccessful"
-    FAILED = "Failed"
+    SUCCESS = "seccessful"
+    FAILED = "failed"
 
 
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[UUID] = mapped_column(primary_key=True)
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     name: Mapped[str] = mapped_column()
     email: Mapped[str] = mapped_column()
     password: Mapped[str] = mapped_column()
@@ -37,7 +37,7 @@ class User(Base):
 class CryptoKey(Base):
     __tablename__ = "crypto_keys"
 
-    id: Mapped[UUID] = mapped_column(primary_key=True)
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     private_key: Mapped[str] = mapped_column()
     public_key: Mapped[str] = mapped_column()
     salt: Mapped[str] = mapped_column()
@@ -50,19 +50,10 @@ class CryptoKey(Base):
 class SessionInfo(Base):
     __table__ = "session_infos"
 
-    id: Mapped[UUID] = mapped_column(primary_key=True)
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     time: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
     location: Mapped[str] = mapped_column()
     ip: Mapped[str] = mapped_column()
     status: Mapped[str] = mapped_column(DBEnum(Status))
     device_info: Mapped[str] = mapped_column()
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
-
-
-# class DeviceInfo(Base):
-#     __table__ = "device_infos"
-
-#     id: Mapped[UUID] = mapped_column(primary_key=True)
-#     operating_system: Mapped[str] = mapped_column()
-#     browser: Mapped[str] = mapped_column()
-#     device: Mapped[str] = mapped_column()

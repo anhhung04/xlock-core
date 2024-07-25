@@ -28,7 +28,9 @@ class User(Base):
     registered_time: Mapped[datetime] = mapped_column(
         default=datetime.now(timezone.utc)
     )
-    updated_time: Mapped[Optional[datetime]] = mapped_column()
+    updated_time: Mapped[Optional[datetime]] = mapped_column(
+        onupdate=datetime.now(timezone.utc)
+    )
     key: Mapped["CryptoKey"] = relationship(back_populates="user")
     sessions: Mapped[List["SessionInfo"]] = relationship()
     items: Mapped[List["Item"]] = relationship()
@@ -48,7 +50,7 @@ class CryptoKey(Base):
 
 
 class SessionInfo(Base):
-    __table__ = "session_infos"
+    __tablename__ = "session_infos"
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     time: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))

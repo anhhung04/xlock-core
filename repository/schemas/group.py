@@ -30,5 +30,4 @@ class UserInGroup(Base):
     group_id: Mapped[UUID] = mapped_column(ForeignKey("groups.id"), primary_key=True)
     role: Mapped[str] = mapped_column()
     joined_time: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
-    left_time: Mapped[Optional[datetime]] = mapped_column()
     user: Mapped["User"] = relationship()

@@ -4,7 +4,7 @@ from repository.schemas.user import Status
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import ForeignKey, Enum as DBEnum
 
-from typing import Optional
+from typing import Optional, List
 
 from uuid import UUID, uuid4
 
@@ -17,14 +17,16 @@ class Item(Base):
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     name: Mapped[str] = mapped_column()
     url: Mapped[str] = mapped_column()
-    logo_url: Mapped[str] = mapped_column()
+    logo_url: Mapped[Optional[str]] = mapped_column()
     description: Mapped[Optional[str]] = mapped_column()
     type: Mapped[str] = mapped_column()
     credentials: Mapped[str] = mapped_column()
     added_time: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
-    last_modified_time: Mapped[Optional[datetime]] = mapped_column()
+    updated_time: Mapped[Optional[datetime]] = mapped_column(
+        onupdate=datetime.now(timezone.utc)
+    )
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
-    histories: Mapped["ItemHistory"] = relationship()
+    histories: Mapped[List["ItemHistory"]] = relationship()
 
     __mapper_args__ = {
         "polymorphic_on": "type",
@@ -80,8 +82,8 @@ class SharingHistory(ItemHistory):
     history_id: Mapped[UUID] = mapped_column(
         ForeignKey("item_histories.id"), primary_key=True
     )
-    recipient_name: Mapped[str] = mapped_column()
-    recipient_email: Mapped[str] = mapped_column()
+    provider_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    recipient_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
 
     __mapper_args__ = {
         "polymorphic_identity": "sharing_history",

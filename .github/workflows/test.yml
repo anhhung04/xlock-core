@@ -1,0 +1,28 @@
+name: FastAPI Test and Report via Webhook
+
+on:
+    push:
+        branches:
+            - main
+    pull_request: # Optional
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        steps:
+            # ... (Previous steps: Checkout, setup Python, install dependencies, run tests)
+
+            - name: Generate Test Report (Replace with your reporting tool)
+              run: |
+                  pytest --junitxml=report.xml  # Example for pytest JUnit XML report
+                  # Adapt this command based on your testing framework and report format
+
+            - name: Send Report via Webhook
+              uses: rjstone/discord-webhook-notify@v1.1.1
+              if: failure() # Send report even if tests fail
+              with:
+                  username: xlock-core test reporter
+                  webhookUrl: ${{ secrets.DISCORD_WEBHOOK_URL }}
+                  text: "Test Results for ${{ github.repository }}"
+                  description: '`\n$(cat report.xml)\n`'

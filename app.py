@@ -1,48 +1,29 @@
 import uvicorn
 
-import os
-
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, APIRouter
 from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from utils.http import APIResponse
+from utils.log import configure_structlog, disable_uvicorn_loggers, logger
 
 from config import config
+from routes.v1 import demo_router
 
-from utils.http import APIResponse
 
-app = FastAPI(docs_url="/api/docs", openapi_url="/api/openapi.json")
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=config["ALLOWED_HOSTS"],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=config["ALLOWED_METHODS"],
 )
 
+api_router = APIRouter(prefix="/v1")
 
-def generate_imports():
-    base_path = "./routes"
-    subdirs = ["api", "public"]
-    imports = []
+api_router.include_router(demo_router, tags=["Demo"], prefix="/demo")
 
-    for subdir in subdirs:
-        path = os.path.join(base_path, subdir)
-        if not os.path.isdir(path):
-            continue
-        for route in os.listdir(path):
-            if route.startswith("_") or not route.endswith(".py"):
-                continue
-            module_name = route.removesuffix(".py")
-            import_statement = f"from routes.{subdir} import {module_name}"
-            imports.append(import_statement)
-
-    return imports
-
-
-imports = generate_imports()
-for imp in imports:
-    print(imp)
+app.include_router(api_router, prefix="/api", tags=["App API v1"])
 
 
 @app.exception_handler(HTTPException)
@@ -56,6 +37,16 @@ async def request_validate_handler(request, exc):
         status.HTTP_422_UNPROCESSABLE_ENTITY, "Invalid request", exc.errors()
     )
 
+
+app.add_event_handler(
+    "startup",
+    lambda: logger.info(
+        "Application starting up", app_name="xlock", environment="production"
+    ),
+)
+
+configure_structlog()
+disable_uvicorn_loggers()
 
 if __name__ == "__main__":
     uvicorn.run(

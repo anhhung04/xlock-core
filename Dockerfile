@@ -12,7 +12,6 @@ RUN apk add --no-cache pkgconfig \
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-RUN pip install -r requirements-dev.txt
 
 COPY . .
 

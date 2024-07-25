@@ -11,6 +11,6 @@ class DemoService:
     ):
         self._demo_repo = demo_repo
 
-    def demo(self):
+    async def demo(self):
         logger.info("Demo service")
-        return self._demo_repo.demo()
+        return await self._demo_repo.demo()

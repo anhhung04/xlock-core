@@ -1,0 +1,64 @@
+name: ci
+
+on:
+    pull_request:
+        types: [closed]
+
+env:
+    IMAGE_PREFIX: ${{ github.repository }}
+
+permissions:
+    contents: write
+    pull-requests: write
+    packages: write
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        # if: github.event.pull_request.merged
+        steps:
+            - name: Get Next Version
+              id: semver
+              uses: ietf-tools/semver-action@v1
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  branch: main
+
+            - name: Set up QEMU
+              uses: docker/setup-qemu-action@v3
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Login to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.repository_owner }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Build and push
+              uses: docker/build-push-action@v6
+              with:
+                  push: true
+                  tags: ghcr.io/${{ env.IMAGE_PREFIX }}:${{ steps.semver.outputs.next }}
+
+    deploy:
+        runs-on: ubuntu-latest
+        if: github.event.pull_request.merged == true && success() && false
+        steps:
+            - name: SSH into Server and Execute Commands
+              uses: appleboy/ssh-action@master
+              with:
+                  host: ${{ secrets.DEPLOY_SERVER_HOST }}
+                  username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
+                  key: ${{ secrets.DEPLOY_SERVER_SSH_KEY }}
+                  port: ${{ secrets.DEPLOY_SERVER_PORT }}
+                  script: |
+                      docker login ghcr.io -u ${{ github.repository_owner }} -p ${{ secrets.GITHUB_TOKEN }}
+                      docker compose pull
+                      docker compose down
+                      docker compose up -d --build
+                      # Post deployment commands
+                      docker system prune -f
+                      docker logout ghcr.io

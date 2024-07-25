@@ -25,10 +25,11 @@ jobs:
                   pip install -r requirements.txt
                   pip install -r requirements-dev.txt
 
-            - name: Generate Test Report (Replace with your reporting tool)
+            - name: Generate Test Report
+              id: generate_report
               run: |
                   pytest --junitxml=report.xml  # Example for pytest JUnit XML report
-                  # Adapt this command based on your testing framework and report format
+                  echo "::set-output name=report::$(cat report.xml)"
 
             - name: Send Report via Webhook
               uses: rjstone/discord-webhook-notify@v1.1.1
@@ -36,5 +37,8 @@ jobs:
               with:
                   username: xlock-core test reporter
                   webhookUrl: ${{ secrets.DISCORD_WEBHOOK_URL }}
-                  text: "Test Results for ${{ github.repository }}"
-                  description: '`\n$(cat report.xml)\n`'
+                  text: "Test Results for branch ${{ github.ref_name }} on ${{ github.repository }}"
+                  description: |
+                      ```
+                          ${{ steps.generate_report.outputs.report }}
+                      ```

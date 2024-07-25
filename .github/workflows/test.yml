@@ -34,14 +34,14 @@ jobs:
                     exit_code=$?
                     if [ $exit_code -eq 5 ]; then
                         echo "Exit code indicates success. Continuing..."
-                        echo "success=success" >> $GITHUB_OUTPUT
+                        echo "result=success" >> $GITHUB_OUTPUT
                     else
-                        echo "success=error" >> $GITHUB_OUTPUT
+                        echo "result=error" >> $GITHUB_OUTPUT
                         exit $exit_code
                     fi
                   fi
                   # Generate report
-                  echo "report=$(cat output.txt)" >> $GITHUB_OUTPUT
+                  echo "report=$(<output.txt)" >> $GITHUB_OUTPUT
 
             - name: Send Report via Webhook
               uses: rjstone/discord-webhook-notify@v1.1.1
@@ -54,4 +54,4 @@ jobs:
                       ```console
                           ${{ steps.generate_report.outputs.report }}
                       ```
-                  severity: ${{ steps.generate_report.outputs.success }}
+                  severity: ${{ steps.generate_report.outputs.result }}

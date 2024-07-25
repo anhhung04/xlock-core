@@ -28,11 +28,18 @@ jobs:
             - name: Generate Test Report
               id: generate_report
               run: |
-                  pytest > output.txt 2>&1;
-                  exit_code=$?
-                  echo "report=$(<output.txt)" >> $GITHUB_OUTPUT
+                  exit_code=0
+                  if pytest > output.txt 2>&1; then
+                    exit_code=$?
+                  else
+                    exit_code=$?
+                  fi
+                  report=$(<output.txt)
+                  echo "report<<EOF" >> $GITHUB_OUTPUT
+                  echo "$report" >> $GITHUB_OUTPUT
+                  echo "EOF" >> $GITHUB_OUTPUT
                   # Generate report
-                  if [ $exit_code -eq 5 || $exit_code -eq 0  ]; then
+                  if [ $exit_code -eq 5 ] || [ $exit_code -eq 0 ]; then
                     echo "Exit code indicates success. Continuing..."
                     echo "::set-output name=result::success"
                   else

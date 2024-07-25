@@ -11,7 +11,19 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            # ... (Previous steps: Checkout, setup Python, install dependencies, run tests)
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+
+            - name: Set up Python 3.12
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.12
+
+            - name: Install Dependencies
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install -r requirements.txt
+                  pip install -r requirements-dev.txt
 
             - name: Generate Test Report (Replace with your reporting tool)
               run: |

@@ -1,0 +1,46 @@
+name: Create tag and release
+
+on:
+    push:
+        branches:
+            - main
+        tags:
+            - "v*"
+
+jobs:
+    tag_and_release:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write # To create releases
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0 # Get all history for release notes
+
+            - name: Generate Release Notes
+              if: github.event_name == 'push' && startsWith(github.ref, 'refs/pull')
+              id: release_notes # Reference the output later
+              uses: release-drafter/release-drafter@v5
+              with:
+                  config-name: release-drafter.yml
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Get Next Version
+              id: semver
+              uses: ietf-tools/semver-action@v1
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  branch: main
+
+            - name: Create Release
+              uses: actions/create-release@v1
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: ${{ steps.semver.outputs.next }}
+                  release_name: Release ${{ github.ref }}
+                  body: ${{ steps.release_notes.outputs.body }}
+                  draft: false
+                  prerelease: false

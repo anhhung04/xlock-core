@@ -26,17 +26,6 @@ class AddUserModel(BaseModel):
     update_time: str
 
 
-class PatchUserDetailModel(BaseModel):
-    name: str
-    email: EmailStr
-    update_time: str
-
-
-class PatchUserPrivateInfoModel(PatchUserDetailModel):
-    name: str
-    password: str
-
-
 class QueryUserModel(BaseModel):
     name: str
     id: UUID

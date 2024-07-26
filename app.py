@@ -5,7 +5,7 @@ from utils.http import APIResponse
 from utils.log import logger
 
 from config import config
-from routes.v1 import demo_router
+from routes.v1 import *
 
 
 app = FastAPI()
@@ -20,6 +20,7 @@ app.add_middleware(
 api_router = APIRouter(prefix="/v1")
 
 api_router.include_router(demo_router, tags=["Demo"], prefix="/demo")
+api_router.include_router(authRouter, tags=["Auth"], prefix="/auth")
 
 app.include_router(api_router, prefix="/api", tags=["App API v1"])
 

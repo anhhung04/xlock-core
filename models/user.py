@@ -1,33 +1,36 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr
 from uuid import UUID
-from datetime import datetime
+from typing import Optional
+
+
+class RSAKeyPair(BaseModel):
+    public: str
+    enc_pri: str
+    salt: str
 
 
 class UserDetail(BaseModel):
     name: str
     email: EmailStr
-    id: UUID
-    update_at: datetime
-    create_at: datetime
 
 
 class UserDetailResponse(UserDetail):
     data: UserDetail
 
 
-class AddUserDetailModel(UserDetail):
+class UserDetailWithKey(UserDetail):
+    rsa_key_pair: RSAKeyPair
+
+
+class UserDetailWithKeyResponse(UserDetailWithKey):
+    data: UserDetailWithKey
+
+
+class NewUserDetailModel(UserDetailWithKey):
     password: str
 
 
-class AddUserModel(BaseModel):
-    name: str = Field(pattern=r"^[A-Za-z][A-Za-z0-9_]{7,29}$")
-    email: EmailStr
-    id: UUID
-    update_at: datetime
-    create_at: datetime
-
-
 class QueryUserModel(BaseModel):
-    name: str
-    id: UUID
-    email: EmailStr
+    name: Optional[str] = None
+    id: Optional[UUID] = None
+    email: Optional[EmailStr] = None

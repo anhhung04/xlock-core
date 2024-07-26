@@ -10,6 +10,7 @@ class RSAKeyPair(BaseModel):
 
 
 class UserDetail(BaseModel):
+    id: UUID
     name: str
     email: EmailStr
 

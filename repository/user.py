@@ -35,6 +35,6 @@ class UserRepository:
             .filter_by(**query.model_dump(exclude_none=True))
             .first()
         )
-        if not existUser:
+        if existUser is None:
             return None
         return UserDetail.model_validate(existUser, from_attributes=True)

@@ -22,7 +22,7 @@ async def login_user(
     authInfo: UserAuth,
     service: AuthService = Depends(AuthService),
 ):
-    result = await service.verify(authInfo)
+    result = await service.gen_token(authInfo)
 
     await service.log(authInfo.email)
 

@@ -1,4 +1,5 @@
 from fastapi import Depends
+from fastapi.exceptions import HTTPException
 from repository.user import UserRepository
 from repository import Storage
 from models.user import *  # noqa: F403
@@ -6,6 +7,7 @@ from models.auth import *  # noqa: F403
 from hashlib import pbkdf2_hmac
 from config import config
 from utils.http import JWTHandler
+from utils.log import logger
 
 
 class PasswordProcesser:
@@ -36,19 +38,23 @@ class AuthService:
         self._jwt = JWTHandler(storage._fstore)
 
     async def create(self, newUser: NewUserDetailModel):
-        existUser = await self._repo.get(QueryUserModel(name=newUser.email))
+        existUser = await self._repo.get(QueryUserModel(email=newUser.email))
         if existUser:
             raise Exception("User already exists")
         newUser.password = PasswordProcesser(newUser.password, config["SALT"]).hash()
         return await self._repo.add(newUser)
 
-    async def verify(self, authInfo: UserAuth) -> AccessResponse:
-        existUser = await self._repo.get(authInfo.email)
-        assert existUser, "User does not exist"
-        assert PasswordProcesser(authInfo.password, config["SALT"]).verify(
-            existUser.password
-        ), "Password does not match"
-        return self._jwt.gen({"id": existUser.id})
+    async def gen_token(self, authInfo: UserAuth) -> AccessResponse:
+        existUser = await self._repo.get(QueryUserModel(email=authInfo.email))
+        # assert existUser, "User does not exist"
+        # assert PasswordProcesser(authInfo.password, config["SALT"]).verify(
+        #     existUser.password
+        # ), "Password does not match"
+        if not existUser:
+            raise HTTPException(404, "User does not exist")
+        return AccessResponse(
+            access_token=self._jwt.gen({"id": str(existUser.id)})
+        )
 
     async def verify(self, email: str) -> IsValidToken:
         return IsValidToken(is_valid=self._jwt.verify(email) is not None)

@@ -48,5 +48,7 @@ logs:
 dev: down-dev up-dev
 	fastapi dev app.py --reload --host 0.0.0.0 --port 8000
 
+restart-server:
+	fastapi dev app.py --reload --host 0.0.0.0 --port 8000
 
 

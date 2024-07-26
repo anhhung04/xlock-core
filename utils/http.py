@@ -15,7 +15,7 @@ class JWTHandler:
 
     def gen(self, payload: dict) -> str:
         assert "id" in payload, "Payload must contain id"
-        secret: str = choices(ascii_letters + digits, k=64)
+        secret: str = ''.join(choices(ascii_letters + digits, k=64))
         self._secret_store.set(payload["id"], secret)
         return encode(payload, secret, algorithm="HS256")
 

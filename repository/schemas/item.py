@@ -1,5 +1,4 @@
-from repository.schemas import Base
-from repository.schemas.user import Status
+from repository.schemas import Base, Status
 
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import ForeignKey, Enum as DBEnum

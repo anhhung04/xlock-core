@@ -21,5 +21,5 @@ config = {
     "REDIS_PORT": os.getenv("REDIS_PORT", "6379"),
     "MAX_CONNECTIONS_REDIS": 20,
     "LOG_LEVEL": os.getenv("LOG_LEVEL", "INFO"),
-    "PASSWORD_SALT": os.getenv("PASSWORD_SALT", "xlock-salt"),
+    "SALT": os.getenv("PASSWORD_SALT", "xlock-salt"),
 }

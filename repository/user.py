@@ -10,13 +10,16 @@ class UserRepository:
         self._sess = storage._db
 
     async def add(self, newUser: NewUserDetailModel) -> UserDetail:
-        newUserAsDict = newUser.model_dump()
-        newUserAsDict.update(
-            {
-                "id": uuid4(),
-            }
+        newUser = User(
+            name=newUser.name,
+            email=newUser.email,
+            password=newUser.password,
+            key=CryptoKey(
+                public_key=newUser.rsa_key_pair.public,
+                private_key=newUser.rsa_key_pair.enc_pri,
+                salt=newUser.rsa_key_pair.salt,
+            )
         )
-        newUser = User(**newUserAsDict)
         try:
             self._sess.add(newUser)
             self._sess.commit()
@@ -26,11 +29,12 @@ class UserRepository:
             raise Exception(e)
         return UserDetail.model_validate(newUser, strict=False, from_attributes=True)
 
-    async def get(self, query: QueryUserModel) -> UserDetail:
+    async def get(self, query: QueryUserModel) -> UserDetail | None:
         existUser = (
             self._sess.query(User)
             .filter_by(**query.model_dump(exclude_none=True))
             .first()
         )
-        assert existUser, "User not found"
+        if not existUser:
+            return None
         return UserDetail.model_validate(existUser, from_attributes=True)

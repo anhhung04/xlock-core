@@ -26,7 +26,7 @@ class Item(Base):
         onupdate=datetime.now(timezone.utc)
     )
     owner_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
-    owner: Mapped["User"] = relationship("User", back_populates="items")
+    owner: Mapped["User"] = relationship(back_populates="items")
     histories: Mapped[List["ItemHistory"]] = relationship()
 
     __mapper_args__ = {

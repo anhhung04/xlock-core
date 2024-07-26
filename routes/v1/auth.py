@@ -13,7 +13,7 @@ async def create_user(
     newUserInfo: NewUserDetailModel,
     service: AuthService = Depends(AuthService),
 ):
-    new_user = await service.create_user(newUserInfo)
+    new_user = await service.create(newUserInfo)
     return APIResponse.as_json(201, "User created successfully", new_user.model_dump())
 
 

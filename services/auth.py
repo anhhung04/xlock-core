@@ -1,11 +1,12 @@
 from fastapi import Depends
 from repository.user import UserRepository
 from repository import Storage
-from models.user import *
-from models.auth import *
+from models.user import *  # noqa: F403
+from models.auth import *  # noqa: F403
 from hashlib import pbkdf2_hmac
 from config import config
 from utils.http import JWTHandler
+
 
 class PasswordProcesser:
     def __init__(self, raw_pass: str, salt):
@@ -34,17 +35,17 @@ class AuthService:
         self._repo = repo
         self._jwt = JWTHandler(storage._fstore)
 
-    async def create_user(self, newUser: NewUserDetailModel):
-        existUser = await self._repo.get(newUser.username)
+    async def create(self, newUser: NewUserDetailModel):
+        existUser = await self._repo.get(QueryUserModel(name=newUser.email))
         if existUser:
             raise Exception("User already exists")
-        newUser.password = PasswordProcesser(newUser.password, config.SALT).hash()
+        newUser.password = PasswordProcesser(newUser.password, config["SALT"]).hash()
         return await self._repo.add(newUser)
 
     async def verify(self, authInfo: UserAuth) -> AccessResponse:
         existUser = await self._repo.get(authInfo.email)
         assert existUser, "User does not exist"
-        assert PasswordProcesser(authInfo.password, config.SALT).verify(
+        assert PasswordProcesser(authInfo.password, config["SALT"]).verify(
             existUser.password
         ), "Password does not match"
         return self._jwt.gen({"id": existUser.id})

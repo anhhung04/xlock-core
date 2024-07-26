@@ -12,6 +12,9 @@ db:
 	docker run -d --name dev_xlock_db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -p 5432:5432 postgres:16.3-alpine3.20
 	docker run -d --name dev_xlock_redis -p 6379:6379 redis:7.2.5-alpine
 
+view-db:
+	docker exec -it xlock-core-postgres-dev-1 psql postgres --username postgres -w
+
 clean-db:
 	docker stop dev_xlock_db
 	docker rm dev_xlock_db

@@ -5,7 +5,7 @@ from utils.http import APIResponse
 from utils.log import logger
 
 from config import config
-from routes.v1 import *
+from routes.v1 import *  # noqa: F403
 
 
 app = FastAPI()

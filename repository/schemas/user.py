@@ -16,7 +16,7 @@ class User(Base):
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     name: Mapped[str] = mapped_column()
-    email: Mapped[str] = mapped_column()
+    email: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
     updated_at: Mapped[Optional[datetime]] = mapped_column(
@@ -24,7 +24,7 @@ class User(Base):
     )
     key: Mapped["CryptoKey"] = relationship(back_populates="user")
     sessions: Mapped[List["SessionInfo"]] = relationship()
-    items: Mapped[List["Item"]] = relationship()
+    items: Mapped[List["Item"]] = relationship(back_populates="owner")
 
 
 class CryptoKey(Base):

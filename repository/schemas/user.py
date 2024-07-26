@@ -18,10 +18,8 @@ class User(Base):
     name: Mapped[str] = mapped_column()
     email: Mapped[str] = mapped_column()
     password: Mapped[str] = mapped_column()
-    registered_time: Mapped[datetime] = mapped_column(
-        default=datetime.now(timezone.utc)
-    )
-    updated_time: Mapped[Optional[datetime]] = mapped_column(
+    created_at: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
+    updated_at: Mapped[Optional[datetime]] = mapped_column(
         onupdate=datetime.now(timezone.utc)
     )
     key: Mapped["CryptoKey"] = relationship(back_populates="user")
@@ -50,7 +48,9 @@ class SessionInfo(Base):
     location: Mapped[str] = mapped_column()
     ip: Mapped[str] = mapped_column()
     status: Mapped[str] = mapped_column(DBEnum(Status))
-    device_info: Mapped[str] = mapped_column()
+    user_agent: Mapped[str] = mapped_column()
+    device_fk: Mapped[str] = mapped_column(ForeignKey("devices.id"))
+    device: Mapped["Device"] = relationship()
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
 
 
@@ -60,8 +60,8 @@ class Group(Base):
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     name: Mapped[str] = mapped_column()
     description: Mapped[Optional[str]] = mapped_column()
-    created_time: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
-    updated_time: Mapped[Optional[datetime]] = mapped_column()
+    created_at: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
+    updated_at: Mapped[Optional[datetime]] = mapped_column()
     member_counts: Mapped[int] = mapped_column()
     members: Mapped[List["UserInGroup"]] = relationship()
 
@@ -72,5 +72,15 @@ class UserInGroup(Base):
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), primary_key=True)
     group_id: Mapped[UUID] = mapped_column(ForeignKey("groups.id"), primary_key=True)
     role: Mapped[str] = mapped_column()
-    joined_time: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
+    joined_at: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
     user: Mapped["User"] = relationship()
+
+
+class Device(Base):
+    __tablename__ = "devices"
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    device_id: Mapped[UUID] = mapped_column(unique=True)
+    broswer: Mapped[str] = mapped_column()
+    os: Mapped[str] = mapped_column()
+    device_type: Mapped[str] = mapped_column()

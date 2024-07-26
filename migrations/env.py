@@ -5,6 +5,15 @@ from sqlalchemy import pool
 
 from alembic import context
 
+from repository.schemas.user import User, CryptoKey, SessionInfo, Group, UserInGroup
+from repository.schemas.item import (
+    Item,
+    PersonalItem,
+    SharedItem,
+    ItemHistory,
+    SharingHistory,
+    FillingHistory,
+)
 from repository.schemas import Base
 
 import os
@@ -24,11 +33,11 @@ if config.config_file_name is not None:
 config.set_main_option(
     "sqlalchemy.url",
     (
-        f"postgresql://{os.getenv('POSTGRES_USER', 'dev_user')}:"
-        f"{os.getenv('POSTGRES_PASSWORD', 'secret')}@"
+        f"postgresql://{os.getenv('POSTGRES_USER', 'postgres')}:"
+        f"{os.getenv('POSTGRES_PASSWORD', 'postgres')}@"
         f"{os.getenv('POSTGRES_HOST', 'localhost')}:"
         f"{os.getenv('POSTGRES_PORT', '5432')}/"
-        f"{os.getenv('POSTGRES_DB', 'dev_xlock')}"
+        f"{os.getenv('POSTGRES_DB', 'postgres')}"
     ),
 )
 
@@ -83,10 +92,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection,
-            target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

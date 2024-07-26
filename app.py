@@ -1,10 +1,8 @@
-import uvicorn
-
 from fastapi import FastAPI, status, APIRouter
 from fastapi.exceptions import HTTPException, RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from utils.http import APIResponse
-from utils.log import configure_structlog, disable_uvicorn_loggers, logger
+from utils.log import logger
 
 from config import config
 from routes.v1 import demo_router
@@ -44,15 +42,3 @@ app.add_event_handler(
         "Application starting up", app_name="xlock", environment="production"
     ),
 )
-
-configure_structlog()
-disable_uvicorn_loggers()
-
-if __name__ == "__main__":
-    uvicorn.run(
-        "app:app",
-        host=config["HOST"],
-        port=config["PORT"],
-        reload=True,
-        workers=config["workers"] if config["PROD"] else 1,
-    )

@@ -6,5 +6,5 @@ Base = declarative_base()
 
 
 class Status(Enum):
-    SUCCESS = "seccessful"
+    SUCCESS = "successful"
     FAILED = "failed"

@@ -20,8 +20,8 @@ class Item(Base):
     description: Mapped[Optional[str]] = mapped_column()
     type: Mapped[str] = mapped_column()
     credentials: Mapped[str] = mapped_column()
-    added_time: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
-    updated_time: Mapped[Optional[datetime]] = mapped_column(
+    added_at: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
+    updated_at: Mapped[Optional[datetime]] = mapped_column(
         onupdate=datetime.now(timezone.utc)
     )
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
@@ -65,7 +65,6 @@ class ItemHistory(Base):
     time: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
     location: Mapped[str] = mapped_column()
     ip: Mapped[str] = mapped_column()
-    device_info: Mapped[str] = mapped_column()
     status: Mapped[str] = mapped_column(DBEnum(Status))
     item_id: Mapped[UUID] = mapped_column(ForeignKey("items.id"))
 

@@ -17,13 +17,6 @@ jobs:
         runs-on: ubuntu-latest
         # if: github.event.pull_request.merged
         steps:
-            - name: Get Next Version
-              id: semver
-              uses: ietf-tools/semver-action@v1
-              with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
-                  branch: main
-
             - name: Set up QEMU
               uses: docker/setup-qemu-action@v3
 
@@ -41,7 +34,7 @@ jobs:
               uses: docker/build-push-action@v6
               with:
                   push: true
-                  tags: ghcr.io/${{ env.IMAGE_PREFIX }}:${{ steps.semver.outputs.next }}
+                  tags: ghcr.io/${{ env.IMAGE_PREFIX }}:latest
 
     deploy:
         runs-on: ubuntu-latest

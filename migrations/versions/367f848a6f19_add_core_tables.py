@@ -70,7 +70,7 @@ def upgrade() -> None:
         "items",
         sa.Column("id", sa.Uuid(), nullable=False),
         sa.Column("name", sa.String(), nullable=False),
-        sa.Column("url", sa.String(), nullable=False),
+        sa.Column("site", sa.String(), nullable=False),
         sa.Column("logo_url", sa.String(), nullable=True),
         sa.Column("description", sa.String(), nullable=True),
         sa.Column("type", sa.String(), nullable=False),

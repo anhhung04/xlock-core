@@ -6,7 +6,6 @@ class ItemModel(BaseModel):
     name: str
     site: str
     description: str
-    type: str
     credentials: str
 
 

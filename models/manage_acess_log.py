@@ -9,5 +9,6 @@ class ManageAccessLogModel(BaseModel):
     time: str
     status: str
     location: str
-    device_info: str
+    user_agent: str
+    device_id: str
     ip: str

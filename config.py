@@ -11,13 +11,14 @@ config = {
     "ALLOWED_HOSTS": ["*"],
     "ALLOWED_METHODS": ["*"],
     "POSTGRES_SQL_URL": (
-        f"postgresql://{os.getenv('POSTGRES_USER', 'dev_user')}:"
-        f"{os.getenv('POSTGRES_PASSWORD', 'secret')}@"
-        f"{os.getenv('POSTGRES_HOST', 'database')}:"
+        f"postgresql://{os.getenv('POSTGRES_USER', 'postgres')}:"
+        f"{os.getenv('POSTGRES_PASSWORD', 'postgres')}@"
+        f"{os.getenv('POSTGRES_HOST', 'localhost')}:"
         f"{os.getenv('POSTGRES_PORT', '5432')}/"
-        f"{os.getenv('POSTGRES_DB', 'dev_xlock')}"
+        f"{os.getenv('POSTGRES_DB', 'postgres')}"
     ),
     "REDIS_HOST": os.getenv("REDIS_HOST", "redis"),
     "REDIS_PORT": os.getenv("REDIS_PORT", "6379"),
     "MAX_CONNECTIONS_REDIS": 20,
+    "LOG_LEVEL": os.getenv("LOG_LEVEL", "INFO"),
 }

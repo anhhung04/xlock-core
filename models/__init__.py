@@ -16,7 +16,7 @@ from models.auth import (
     LogoutData,
     LogoutResponseModel,
 )
-from models.manage_acess_log import ManageAccessLogModel
+from models.session_info import ManageAccessLogModel
 from models.crypto_keys import CryptoKeysModel
 from models.response import BaseResponseModel
 

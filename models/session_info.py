@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from uuid import UUID
 
 
-class ManageAccessLogModel(BaseModel):
+class SesionInfoModel(BaseModel):
     id: str
     user_id: UUID
     action: str

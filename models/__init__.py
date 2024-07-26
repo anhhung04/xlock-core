@@ -5,7 +5,7 @@ from models.user import (
     AddUserModel,
     QueryUserModel,
 )
-from models.items import ItemModel, ItemResponseModel, AddItemModel
+from models.item import ItemModel, ItemResponseModel, AddItemModel
 from models.auth import (
     UserAuth,
     VerifyTokenRequest,

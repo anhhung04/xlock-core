@@ -21,6 +21,7 @@ api_router = APIRouter(prefix="/v1")
 
 api_router.include_router(demo_router, tags=["Demo"], prefix="/demo")
 api_router.include_router(authRouter, tags=["Auth"], prefix="/auth")
+api_router.include_router(itemRouter, tags=["Item"], prefix="/items")
 
 app.include_router(api_router, prefix="/api", tags=["App API v1"])
 

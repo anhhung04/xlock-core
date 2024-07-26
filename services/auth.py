@@ -5,11 +5,7 @@ from models.user import *
 from models.auth import *
 from hashlib import pbkdf2_hmac
 from config import config
-from redis import Redis
-from jwt import encode, decode
-from string import ascii_letters, digits
-from random import choices
-
+from utils.http import JWTHandler
 
 class PasswordProcesser:
     def __init__(self, raw_pass: str, salt):
@@ -27,22 +23,6 @@ class PasswordProcesser:
 
     def verify(self, hashed_pass: str):
         return self.hash() == hashed_pass
-
-
-class JWTHandler:
-    def __init__(self, secret_store: Redis):
-        self._secret_store = secret_store
-
-    def gen(self, payload: dict) -> str:
-        assert "id" in payload, "Payload must contain id"
-        secret: str = choices(ascii_letters + digits, k=64)
-        self._secret_store.set(payload["id"], secret)
-        return encode(payload, secret, algorithm="HS256")
-
-    def verify(self, token: str) -> dict:
-        payload = decode(token, options={"verify_signature": False})
-        secret = self._secret_store.get(payload["id"])
-        return decode(token, secret, algorithms="HS256")
 
 
 class AuthService:

@@ -13,7 +13,7 @@ db:
 	docker run -d --name dev_xlock_redis -p 6379:6379 redis:7.2.5-alpine
 
 view-db:
-	docker exec -it xlock-core-postgres-dev-1 psql postgres --username postgres -w
+	docker compose --profile dev exec postgres-dev psql postgres --username postgres -w
 
 clean-db:
 	docker stop dev_xlock_db
@@ -46,9 +46,11 @@ logs:
 	docker compose --profile dev logs -f
 
 dev: down-dev up-dev
+	POSTGRES_HOST=localhost REDIS_HOST=localhost \
 	fastapi dev app.py --reload --host 0.0.0.0 --port 8000
 
 restart-server:
+	POSTGRES_HOST=localhost REDIS_HOST=localhost \
 	fastapi dev app.py --reload --host 0.0.0.0 --port 8000
 
 

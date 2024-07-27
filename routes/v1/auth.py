@@ -27,9 +27,9 @@ async def login_user(
     await service.log(authInfo.email)
 
     res = APIResponse.as_json(200, "User logged in successfully", result)
-    res.set_cookie(
-        "auth", result["access_token"], httponly=True, samesite="strict", path="/api"
-    )
+    # res.set_cookie(
+    #     "auth", result["access_token"], httponly=True, samesite="strict", path="/api"
+    # )
     return res
 
 

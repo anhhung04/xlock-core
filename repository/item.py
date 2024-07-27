@@ -11,19 +11,52 @@ class ItemRepository:
     def __init__(self, storage: Storage = Depends(Storage)):
         self._sess = storage._db
 
-    async def list(self, site: str) -> List[Item]: 
-        items = await self._sess.query(Item).filter(Item.site == site).all()  
+    async def list(self, id: str, site: str) -> List[PersonalItem | SharedItem]: 
+        try:
+            items = self._sess.query(Item).filter(Item.site == site).all() 
+        except Exception as e:
+            raise Exception(e)
         return items
 
-    async def add(self, item: AddItemModel, user_id: str) -> PersonalItem:  
-        personalItem = PersonalItem(
-            name=item.name,
-            site=item.site,
-            description=item.description,
-            credentials=item.credentials,
-            owner_id=user_id,
-        ) 
-        self._sess.add(personalItem)
-        self._sess.commit()
-        self._sess.refresh(personalItem)
+    async def add(self, item: CreateItemModel, user_id: str) -> PersonalItem:
+        try:
+            personalItem = PersonalItem(
+                name=item.name,
+                site=item.site,
+                description=item.description,
+                credentials=item.credentials,
+                owner_id=user_id,
+            )
+            self._sess.add(personalItem)
+            self._sess.commit()
+            self._sess.refresh(personalItem)
+        except Exception as e:
+            self._sess.rollback()
+            raise Exception(e)
         return personalItem
+    
+    async def update(self, item_id: str, item: UpdateItemModel) -> PersonalItem:
+        try:
+            personalItem = self._sess.query(PersonalItem).filter(PersonalItem.id == item_id).first()
+            if not personalItem:
+                raise Exception("Item not found")
+            for key, value in item.model_dump(exclude_none=True).items():
+                setattr(personalItem, key, value)
+            self._sess.commit()
+            self._sess.refresh(personalItem)
+        except Exception as e:
+            self._sess.rollback()
+            raise Exception(e)
+        return personalItem
+    
+    async def delete(self, item_id: str) -> None:
+        try:
+            personalItem = self._sess.query(PersonalItem).filter(PersonalItem.id == item_id).first()
+            if not personalItem:
+                raise Exception("Item not found")
+            self._sess.delete(personalItem)
+            self._sess.commit()
+        except Exception as e:
+            self._sess.rollback()
+            raise Exception(e)
+        return None

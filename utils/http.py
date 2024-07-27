@@ -48,6 +48,6 @@ class UserSession:
         assert self._token is not None, "Please provide a valid token"
         self._db = storage._db
         self._jwt = JWTHandler(storage._fstore)
-        self._user_id = self._jwt.verify(self._token)["id"]
+        self._user_id: str = self._jwt.verify(self._token)["id"]
         self._user = self._db.query(User).filter(User.id == self._user_id).first()
         assert self._user is not None, "User does not exist"

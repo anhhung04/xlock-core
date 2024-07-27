@@ -19,9 +19,27 @@ async def list_items(
 
 @itemRouter.post("/create", tags=["Item"], response_model=ItemResponseModel)
 async def create_item(
-    item: AddItemModel,
+    item: CreateItemModel,
     service: ItemService = Depends(ItemService),
 ):
     return APIResponse.as_json(
         201, "Item created successfully", {"item": await service.create(item)}
     )
+
+@itemRouter.patch("/update/{item_id}", tags=["Item"], response_model=ItemResponseModel)
+async def update_item(
+    item_id: str,
+    item: UpdateItemModel,
+    service: ItemService = Depends(ItemService),
+):
+    return APIResponse.as_json(
+        201, "Item updated successfully", {"item": await service.update(item_id, item)}
+    )
+
+@itemRouter.delete("/delete/{item_id}", tags=["Item"], response_model=ItemResponseModel)
+async def delete_item(
+    item_id: str,
+    service: ItemService = Depends(ItemService),
+):
+    await service.delete(item_id)
+    return APIResponse.as_json(201, "Item deleted successfully")

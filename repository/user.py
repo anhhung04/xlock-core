@@ -9,7 +9,7 @@ class UserRepository:
     def __init__(self, storage: Storage = Depends(Storage)):
         self._sess = storage._db
 
-    async def add(self, newUser: NewUserDetailModel) -> User:
+    async def add(self, newUser: CreateUserModel) -> User:
         newUser = User(
             name=newUser.name,
             email=newUser.email,
@@ -39,3 +39,32 @@ class UserRepository:
         except Exception as e:
             raise Exception(e)
         return existUser
+    
+    async def update(self, id: str, userInfo: UpdateUserModel) -> User:
+        try:
+            user = self._sess.query(User).filter(User.id == id).first()
+            if user:
+                for key, value in userInfo.model_dump(exclude_none=True).items(): 
+                    setattr(user, key, value)
+                self._sess.commit()
+                self._sess.refresh(user)
+            else:
+                raise Exception("User not found")
+        except Exception as e:
+            raise Exception(e)
+        return user
+    
+    async def delete(self, id: str) -> None:
+        try:
+            user = self._sess.query(User).filter(User.id == id).first()
+            if user:
+                self._sess.delete(user)
+                self._sess.commit()
+            else:
+                raise Exception("User not found")
+        except Exception as e:
+            self._sess.rollback()
+            raise Exception(e)
+        return None
+
+

@@ -8,9 +8,9 @@ from utils.http import *
 authRouter = APIRouter()
 
 
-@authRouter.post("/create", tags=["Auth"], response_model=UserDetailResponse)
-async def create_user(
-    newUserInfo: NewUserDetailModel,
+@authRouter.post("/register", tags=["Auth"], response_model=UserDetailResponse)
+async def register_user(
+    newUserInfo: CreateUserModel,
     service: AuthService = Depends(AuthService),
 ):
     new_user = await service.create(newUserInfo)
@@ -41,3 +41,29 @@ async def verify_token(
     result = await service.verify(tokenInfo.access_token)
 
     return APIResponse.as_json(200, "Token verified", result)
+
+
+@authRouter.get("/user", tags=["Auth"], response_model=UserDetailResponse)
+async def get_user(
+    service: AuthService = Depends(AuthService),
+    session: UserSession = Depends(UserSession),
+):
+    user = await service.get(session._user_id)
+    return APIResponse.as_json(200, "OK", user)
+
+@authRouter.patch("/user", tags=["Auth"], response_model=UserDetailResponse)
+async def update_user(
+    userInfo: UpdateUserModel,
+    service: AuthService = Depends(AuthService),
+    session: UserSession = Depends(UserSession),
+):
+    user = await service.update(session._user_id, userInfo)
+    return APIResponse.as_json(200, "User updated successfully", user)
+
+@authRouter.delete("/user", tags=["Auth"], response_model=UserDetailResponse)
+async def delete_user(
+    service: AuthService = Depends(AuthService),
+    session: UserSession = Depends(UserSession),
+):
+    await service.delete(session._user_id)
+    return APIResponse.as_json(200, "User deleted successfully")

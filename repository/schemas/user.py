@@ -22,9 +22,9 @@ class User(Base):
     updated_at: Mapped[Optional[datetime]] = mapped_column(
         onupdate=datetime.now(timezone.utc)
     )
-    key: Mapped["CryptoKey"] = relationship(back_populates="user")
-    sessions: Mapped[List["SessionInfo"]] = relationship()
-    items: Mapped[List["Item"]] = relationship(back_populates="owner")
+    key: Mapped["CryptoKey"] = relationship(back_populates="user", cascade="all, delete-orphan")
+    sessions: Mapped[List["SessionInfo"]] = relationship(cascade="all, delete-orphan")
+    items: Mapped[List["Item"]] = relationship(back_populates="owner", cascade="all, delete-orphan")
 
 
 class CryptoKey(Base):

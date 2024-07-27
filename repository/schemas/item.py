@@ -27,7 +27,7 @@ class Item(Base):
     )
     owner_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
     owner: Mapped["User"] = relationship(back_populates="items")
-    histories: Mapped[List["ItemHistory"]] = relationship()
+    histories: Mapped[List["ItemHistory"]] = relationship(cascade="all, delete-orphan")
 
     __mapper_args__ = {
         "polymorphic_on": "type",

@@ -15,10 +15,14 @@ class ItemRepository:
         items = await self._sess.query(Item).filter(Item.site == site).all()  
         return items
 
-    async def add(self, item: ItemModel, user_id: str) -> PersonalItem:  
-        itemAsDict = item.model_dump()
-        itemAsDict.update({"id": uuid4(), "owner_id": user_id})
-        personalItem = PersonalItem(**itemAsDict) 
+    async def add(self, item: AddItemModel, user_id: str) -> PersonalItem:  
+        personalItem = PersonalItem(
+            name=item.name,
+            site=item.site,
+            description=item.description,
+            credentials=item.credentials,
+            owner_id=user_id,
+        ) 
         self._sess.add(personalItem)
         self._sess.commit()
         self._sess.refresh(personalItem)

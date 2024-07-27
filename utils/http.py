@@ -41,11 +41,11 @@ class UserSession:
     def __init__(
         self,
         storage: Storage = Depends(Storage),
-        auth_cookie: Optional[str] = Cookie(alias="auth"),
-        auth_header: Optional[str] = Header(alias="Authorization"),
+        auth_cookie: Optional[str] = Cookie(None, alias="auth"),
+        auth_header: Optional[str] = Header(None, alias="Authorization"),
     ):
         self._token = auth_cookie or auth_header
-        assert self._sess is not None, "Please provide a valid token"
+        assert self._token is not None, "Please provide a valid token"
         self._db = storage._db
         self._jwt = JWTHandler(storage._fstore)
         self._user_id = self._jwt.verify(self._token)["id"]

@@ -19,7 +19,7 @@ async def list_items(
 
 @itemRouter.post("/create", tags=["Item"], response_model=ItemResponseModel)
 async def create_item(
-    item: ItemModel,
+    item: AddItemModel,
     service: ItemService = Depends(ItemService),
 ):
     return APIResponse.as_json(

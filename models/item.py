@@ -1,13 +1,14 @@
 from pydantic import BaseModel
 
 
-class ItemModel(BaseModel):
-    id: str
+class AddItemModel(BaseModel):
     name: str
     site: str
     description: str
     credentials: str
 
+class ItemModel(AddItemModel):
+    id: str
 
 class ListItemsResponseModel(BaseModel):
     items: list[ItemModel]

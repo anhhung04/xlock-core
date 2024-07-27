@@ -77,9 +77,9 @@ def upgrade() -> None:
         sa.Column("credentials", sa.String(), nullable=False),
         sa.Column("added_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
-        sa.Column("user_id", sa.Uuid(), nullable=False),
+        sa.Column("owner_id", sa.Uuid(), nullable=False),
         sa.ForeignKeyConstraint(
-            ["user_id"],
+            ["owner_id"],
             ["users.id"],
         ),
         sa.PrimaryKeyConstraint("id"),

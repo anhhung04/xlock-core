@@ -25,9 +25,12 @@ class ItemService:
         ]
         return items
 
-    async def create(self, item: ItemModel) -> dict[str, any]:
-        item = ItemModel.model_validate(
-            await self._repo.add(item, self._user), strict=False, from_attributes=True
-        )
-
-        return item.model_dump()
+    async def create(self, item: AddItemModel) -> dict[str, any]:
+        item = await self._repo.add(item, self._user.id)
+        return ItemModel(
+            id=str(item.id),
+            name=item.name,
+            site=item.site,
+            description=item.description,
+            credentials=item.credentials,
+        ).model_dump()

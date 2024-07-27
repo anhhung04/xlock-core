@@ -14,7 +14,7 @@ async def create_user(
     service: AuthService = Depends(AuthService),
 ):
     new_user = await service.create(newUserInfo)
-    return APIResponse.as_json(201, "User created successfully", new_user.model_dump())
+    return APIResponse.as_json(201, "User created successfully", new_user)
 
 
 @authRouter.post("/login", tags=["Auth"], response_model=UserAuthResponse)
@@ -26,9 +26,9 @@ async def login_user(
 
     await service.log(authInfo.email)
 
-    res = APIResponse.as_json(200, "User logged in successfully", result.model_dump())
+    res = APIResponse.as_json(200, "User logged in successfully", result)
     res.set_cookie(
-        "auth", result.access_token, httponly=True, samesite="strict", path="/api"
+        "auth", result["access_token"], httponly=True, samesite="strict", path="/api"
     )
     return res
 
@@ -40,4 +40,4 @@ async def verify_token(
 ):
     result = await service.verify(tokenInfo.access_token)
 
-    return APIResponse.as_json(200, "Token verified", result.model_dump())
+    return APIResponse.as_json(200, "Token verified", result)

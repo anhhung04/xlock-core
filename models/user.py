@@ -27,8 +27,12 @@ class UserDetailWithKeyResponse(UserDetailWithKey):
     data: UserDetailWithKey
 
 
-class NewUserDetailModel(UserDetailWithKey):
+class NewUserDetailModel(BaseModel):
+    name: str
+    email: EmailStr
     password: str
+    rsa_key_pair: RSAKeyPair
+    
 
 
 class QueryUserModel(BaseModel):

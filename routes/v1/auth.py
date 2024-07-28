@@ -60,7 +60,7 @@ async def update_user(
     user = await service.update(session._user_id, userInfo)
     return APIResponse.as_json(200, "User updated successfully", user)
 
-@authRouter.delete("/user", tags=["Auth"], response_model=UserDetailResponse)
+@authRouter.delete("/user", tags=["Auth"], response_model=DeleteUserResponse)
 async def delete_user(
     service: AuthService = Depends(AuthService),
     session: UserSession = Depends(UserSession),

@@ -7,7 +7,7 @@ from utils.http import *
 itemRouter = APIRouter()
 
 
-@itemRouter.get("/", tags=["Item"], response_model=ListItemsResponseModel)
+@itemRouter.get("/", tags=["Item"], response_model=ItemListResponse)
 async def list_items(
     site: str = Query(..., title="Site", description="Site name"),
     service: ItemService = Depends(ItemService),
@@ -17,7 +17,7 @@ async def list_items(
     )
 
 
-@itemRouter.post("/create", tags=["Item"], response_model=ItemResponseModel)
+@itemRouter.post("/create", tags=["Item"], response_model=ItemDetailResponse)
 async def create_item(
     item: CreateItemModel,
     service: ItemService = Depends(ItemService),
@@ -26,7 +26,7 @@ async def create_item(
         201, "Item created successfully", {"item": await service.create(item)}
     )
 
-@itemRouter.patch("/update/{item_id}", tags=["Item"], response_model=ItemResponseModel)
+@itemRouter.patch("/update/{item_id}", tags=["Item"], response_model=ItemDetailResponse)
 async def update_item(
     item_id: str,
     item: UpdateItemModel,
@@ -36,7 +36,7 @@ async def update_item(
         201, "Item updated successfully", {"item": await service.update(item_id, item)}
     )
 
-@itemRouter.delete("/delete/{item_id}", tags=["Item"], response_model=ItemResponseModel)
+@itemRouter.delete("/delete/{item_id}", tags=["Item"], response_model=DeleteItemResponse)
 async def delete_item(
     item_id: str,
     service: ItemService = Depends(ItemService),

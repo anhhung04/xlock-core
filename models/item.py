@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional, List
+from models.response import BaseResponseModel
 
 class CreateItemModel(BaseModel):
     name: str
@@ -15,12 +16,15 @@ class ItemModel(CreateItemModel):
     updated_at: Optional[str] = None
     logo_url: Optional[str] = None
 
-class ListItemsResponseModel(BaseModel):
-    items: List[ItemModel]
+class ItemListResponse(BaseResponseModel):
+    data: List[ItemModel]
 
 
-class ItemResponseModel(BaseModel):
-    item: ItemModel
+class ItemDetailResponse(BaseResponseModel):
+    data: ItemModel
+
+class DeleteItemResponse(BaseResponseModel):
+    data: None
 
 class UpdateItemModel(BaseModel):
     name: Optional[str] = None

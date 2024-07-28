@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
+from models.response import BaseResponseModel
 
 
 class RSAKeyPair(BaseModel):
@@ -19,13 +20,16 @@ class GetUserDetail(BaseModel):
     created_at: str
     updated_at: Optional[str] = None
 
-class UserDetailResponse(UserDetail):
-    data: UserDetail
+class UserDetailResponse(BaseResponseModel):
+    data: GetUserDetail
+
+class DeleteUserResponse(BaseResponseModel):
+    data: None
 
 class UserDetailWithKey(UserDetail):
     rsa_key_pair: RSAKeyPair
 
-class UserDetailWithKeyResponse(UserDetailWithKey):
+class UserDetailWithKeyResponse(BaseResponseModel):
     data: UserDetailWithKey
 
 class CreateUserModel(BaseModel):

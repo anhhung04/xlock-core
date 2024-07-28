@@ -47,10 +47,12 @@ class UserSession:
     def __init__(
         self,
         storage: Storage = Depends(Storage),
-        auth_cookie: Optional[str] = Cookie(None, alias="auth"),
+        auth_cookie: Annotated[str | None, Cookie(..., alias="auth")] = None,
         auth_header: Annotated[HTTPAuthorizationCredentials, "Authorization header"] = Depends(header),
     ):
         try:
+            logger.info(f"auth_cookie: {auth_cookie}")
+            logger.info(f"auth_header: {auth_header}")
             self._token = auth_cookie or auth_header.credentials            
             self._db = storage._db
             self._jwt = JWTHandler(storage._fstore)

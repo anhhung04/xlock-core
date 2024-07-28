@@ -44,14 +44,8 @@ class Storage:
         self._fstore: Redis = redis
         self._db: Session = db
 
-    def get():
-        db = SessionLocal()
-        try:
-            yield db
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
-        finally:
-            db.close()
+    def get(self):
+        return self._db, self._fstore
 
 
 class RedisStorage:

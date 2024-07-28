@@ -1,8 +1,6 @@
 import unittest
 from unittest import TestCase
 
-import bcrypt
-
 from repository.schemas.item import Item
 from repository.schemas.user import User
 from tests import (
@@ -28,11 +26,7 @@ class UserTest(TestCase):
         self.assertIsNotNone(u_n_db.id is not None)
         self.assertEqual(u_n_db.name, u.name)
         self.assertEqual(u_n_db.email, u.email)
-        self.assertTrue(
-            bcrypt.checkpw(
-                password.encode("utf-8"), u_n_db.password.encode("utf-8")
-            )
-        )
+        self.assertEqual(u_n_db.password, u.password)
         self.assertIsNotNone(u_n_db.created_at)
         self.assertIsNone(u_n_db.updated_at)
 

@@ -6,7 +6,6 @@ from datetime import datetime, timezone
 from unittest import TestCase
 from uuid import uuid4
 
-import bcrypt
 import requests
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -106,15 +105,11 @@ def create_user(name=None, email=None, password=None):
     u = name or gen_username()
     p = password or gen_password()
     id = uuid4()
-    if isinstance(p, bytes):
-        hashed_password = p
-    else:
-        hashed_password = bcrypt.hashpw(p.encode("utf-8"), bcrypt.gensalt())
     user = User(
         id=id,
         name=u,
         email=email or f"{u}@example.com",
-        password=hashed_password.decode("utf-8"),
+        password=p,
         created_at=datetime.now(timezone.utc),
         updated_at=None,
     )

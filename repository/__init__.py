@@ -1,8 +1,8 @@
-from config import config
+from fastapi import Depends
 from redis import ConnectionPool, Redis
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
-from fastapi import Depends
+from sqlalchemy.orm import Session, sessionmaker
+from config import config
 
 engine = create_engine(config["POSTGRES_SQL_URL"])
 redis_pool: ConnectionPool = ConnectionPool(
@@ -41,3 +41,6 @@ class Storage:
     ):
         self._fstore: Redis = redis
         self._db: Session = db
+
+    def get(self):
+        return self._db, self._fstore

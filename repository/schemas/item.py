@@ -21,7 +21,9 @@ class Item(Base):
     description: Mapped[Optional[str]] = mapped_column()
     type: Mapped[str] = mapped_column()
     credentials: Mapped[str] = mapped_column()
-    added_at: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
+    added_at: Mapped[datetime] = mapped_column(
+        default=datetime.now(timezone.utc)
+    )
     updated_at: Mapped[Optional[datetime]] = mapped_column(
         onupdate=datetime.now(timezone.utc)
     )
@@ -38,7 +40,9 @@ class Item(Base):
 class PersonalItem(Item):
     __tablename__ = "personal_items"
 
-    item_id: Mapped[UUID] = mapped_column(ForeignKey("items.id"), primary_key=True)
+    item_id: Mapped[UUID] = mapped_column(
+        ForeignKey("items.id"), primary_key=True
+    )
 
     __mapper_args__ = {
         "polymorphic_identity": "personal_item",
@@ -52,7 +56,9 @@ class SharedItem(Item):
         ForeignKey("items.id"), primary_key=True, default=UUID
     )
     private_key: Mapped[str] = mapped_column()
-    shared_time: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
+    shared_time: Mapped[datetime] = mapped_column(
+        default=datetime.now(timezone.utc)
+    )
 
     __mapper_args__ = {
         "polymorphic_identity": "shared_item",

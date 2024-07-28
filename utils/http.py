@@ -51,13 +51,13 @@ class UserSession:
         auth_header: Annotated[HTTPAuthorizationCredentials, "Authorization header"] = Depends(header),
     ):
         try:
-            logger.info(f"auth_cookie: {auth_cookie}")
-            logger.info(f"auth_header: {auth_header}")
             self._token = auth_cookie or auth_header.credentials            
             self._db = storage._db
             self._jwt = JWTHandler(storage._fstore)
             self._user_id = self._jwt.verify(self._token)["id"]
             self._user = self._db.query(User).filter(User.id == self._user_id).first()
         except Exception:
+            raise HTTPException(status_code=401, detail="Error in authorization")
+        if not self._user:
             raise HTTPException(status_code=401, detail="Unauthorized")
         

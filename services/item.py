@@ -20,6 +20,8 @@ class ItemService:
             items = await self._repo.list(str(self._user.id), site)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
+        if items is None:
+            return []
         items = [
             ItemModel(
                 id=str(item.id),

@@ -22,12 +22,6 @@ class SharingHistoryDTO(ItemHistoryDetail):
     item_history_id: UUID
     recipient_id: UUID
 
-    class Config:
-        orm_mode = True
-
 
 class FillingHistoryDTO(ItemHistoryDetail):
     item_history_id: UUID
-
-    class Config:
-        orm_mode = True

@@ -8,7 +8,7 @@ from typing import Optional, List
 
 from uuid import UUID, uuid4
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 
 
 class User(Base):
@@ -22,6 +22,13 @@ class User(Base):
     updated_at: Mapped[Optional[datetime]] = mapped_column(
         onupdate=datetime.now(timezone.utc)
     )
+    fullname: Mapped[str] = mapped_column()
+    dob: Mapped[date] = mapped_column()
+    address: Mapped[str] = mapped_column()
+    phone_number: Mapped[str] = mapped_column()
+    country: Mapped[str] = mapped_column()
+    gender: Mapped[Optional[str]] = mapped_column()
+    email2: Mapped[Optional[str]] = mapped_column(unique=True)
     key: Mapped["CryptoKey"] = relationship(back_populates="user", cascade="all, delete-orphan")
     sessions: Mapped[List["SessionInfo"]] = relationship(cascade="all, delete-orphan")
     items: Mapped[List["Item"]] = relationship(back_populates="owner", cascade="all, delete-orphan")

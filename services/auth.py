@@ -46,10 +46,19 @@ class AuthService:
             raise HTTPException(status_code=409, detail="User already exists")
         newUser.password = PasswordProcesser(newUser.password, config["SALT"]).hash()
         user = await self._repo.add(newUser)
-        return UserDetail(
+        return GetUserDetail(
             id=str(user.id),
             name=user.name,
             email=user.email,
+            created_at=str(user.created_at),
+            updated_at=str(user.updated_at) if user.updated_at else None,
+            fullname=user.fullname,
+            dob=str(user.dob),
+            address=user.address,
+            phone_number=user.phone_number,
+            country=user.country,
+            gender=user.gender,
+            email2=user.email2,
         ).model_dump()
 
     async def gen_token(self, authInfo: UserAuth) -> dict[str, str]:
@@ -76,12 +85,20 @@ class AuthService:
             raise HTTPException(status_code=500, detail=str(e))
         if not user:
             raise HTTPException(status_code=404, detail="User does not exist")
+        print(user.created_at)
         return GetUserDetail(
             id=str(user.id),
             name=user.name,
             email=user.email,
             created_at=str(user.created_at),
             updated_at=str(user.updated_at) if user.updated_at else None,
+            fullname=user.fullname,
+            dob=str(user.dob),
+            address=user.address,
+            phone_number=user.phone_number,
+            country=user.country,
+            gender=user.gender,
+            email2=user.email2,
         ).model_dump()
     
     async def update(self, id: str, userInfo: UpdateUserModel) -> dict[str, str]:
@@ -94,7 +111,14 @@ class AuthService:
             name=user.name,
             email=user.email,
             created_at=str(user.created_at),
-            updated_at=str(user.updated_at),
+            updated_at=str(user.updated_at) if user.updated_at else None,
+            fullname=user.fullname,
+            dob=str(user.dob),
+            address=user.address,
+            phone_number=user.phone_number,
+            country=user.country,
+            gender=user.gender,
+            email2=user.email2,
         ).model_dump()
     
     async def delete(self, id: str) -> None:

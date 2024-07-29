@@ -14,6 +14,13 @@ class UserRepository:
             name=newUser.name,
             email=newUser.email,
             password=newUser.password,
+            fullname=newUser.fullname,
+            dob=newUser.dob,
+            address=newUser.address,
+            phone_number=newUser.phone_number,
+            country=newUser.country,
+            gender=newUser.gender,
+            email2=newUser.email2,
             key=CryptoKey(
                 public_key=newUser.rsa_key_pair.public,
                 private_key=newUser.rsa_key_pair.enc_pri,

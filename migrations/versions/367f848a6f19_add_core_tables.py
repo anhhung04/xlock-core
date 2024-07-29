@@ -49,8 +49,16 @@ def upgrade() -> None:
         sa.Column("password", sa.String(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
+        sa.Column("fullname", sa.String(), nullable=False),
+        sa.Column("dob", sa.Date(), nullable=False),
+        sa.Column("address", sa.String(), nullable=False),
+        sa.Column("phone_number", sa.String(), nullable=False),
+        sa.Column("country", sa.String(), nullable=False),
+        sa.Column("gender", sa.String(), nullable=True),
+        sa.Column("email2", sa.String(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("email"),
+        sa.UniqueConstraint("email2")
     )
     op.create_table(
         "crypto_keys",

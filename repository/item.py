@@ -11,9 +11,10 @@ class ItemRepository:
     def __init__(self, storage: Storage = Depends(Storage)):
         self._sess = storage._db
 
-    async def list(self, id: str, site: str) -> List[PersonalItem | SharedItem]: 
+    async def list(self, id: str, site: str | None) -> List[PersonalItem | SharedItem]: 
         try:
-            items = self._sess.query(Item).filter(Item.site == site, Item.owner_id == id).all() 
+            items = self._sess.query(Item).filter(Item.owner_id == id)
+            items = items.filter(Item.site == site).all() if site else items.all()
         except Exception as e:
             raise Exception(e)
         return items

@@ -6,7 +6,6 @@ from redis import Redis
 
 from utils.log import logger
 
-
 class DemoRepo:
     def __init__(self, init_storage: Storage = Depends(Storage)):
         self._db: Session = init_storage._db

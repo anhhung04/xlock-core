@@ -1,12 +1,14 @@
-from datetime import datetime, timezone
-from typing import List, Optional
+from repository.schemas import Base, Status
+
+from sqlalchemy.orm import mapped_column, Mapped, relationship
+from sqlalchemy import ForeignKey, Enum as DBEnum
+
+from typing import Optional, List
+
 from uuid import UUID, uuid4
 
-from sqlalchemy import Enum as DBEnum
-from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from repository.schemas import Base, Status
+from datetime import datetime, timezone
+from .user import *
 
 
 class Item(Base):
@@ -14,7 +16,7 @@ class Item(Base):
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     name: Mapped[str] = mapped_column()
-    url: Mapped[str] = mapped_column()
+    site: Mapped[str] = mapped_column()
     logo_url: Mapped[Optional[str]] = mapped_column()
     description: Mapped[Optional[str]] = mapped_column()
     type: Mapped[str] = mapped_column()
@@ -25,8 +27,9 @@ class Item(Base):
     updated_at: Mapped[Optional[datetime]] = mapped_column(
         onupdate=datetime.now(timezone.utc)
     )
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
-    histories: Mapped[List["ItemHistory"]] = relationship()
+    owner_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    owner: Mapped["User"] = relationship(back_populates="items")
+    histories: Mapped[List["ItemHistory"]] = relationship(cascade="all, delete-orphan")
 
     __mapper_args__ = {
         "polymorphic_on": "type",

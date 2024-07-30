@@ -16,15 +16,15 @@ class User(Base):
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     name: Mapped[str] = mapped_column()
-    email: Mapped[str] = mapped_column()
+    email: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
     updated_at: Mapped[Optional[datetime]] = mapped_column(
         onupdate=datetime.now(timezone.utc)
     )
-    key: Mapped["CryptoKey"] = relationship(back_populates="user")
-    sessions: Mapped[List["SessionInfo"]] = relationship()
-    items: Mapped[List["Item"]] = relationship()
+    key: Mapped["CryptoKey"] = relationship(back_populates="user", cascade="all, delete-orphan")
+    sessions: Mapped[List["SessionInfo"]] = relationship(cascade="all, delete-orphan")
+    items: Mapped[List["Item"]] = relationship(back_populates="owner", cascade="all, delete-orphan")
 
 
 class CryptoKey(Base):

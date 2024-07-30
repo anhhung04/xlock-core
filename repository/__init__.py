@@ -1,9 +1,7 @@
-import redis
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 from redis import ConnectionPool, Redis
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
-
 from config import config
 
 engine = create_engine(config["POSTGRES_SQL_URL"])
@@ -46,15 +44,3 @@ class Storage:
 
     def get(self):
         return self._db, self._fstore
-
-
-class RedisStorage:
-    @staticmethod
-    def get():
-        r = redis.Redis(connection_pool=redis_pool)
-        try:
-            yield r
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
-        finally:
-            pass

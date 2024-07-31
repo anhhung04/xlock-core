@@ -123,18 +123,18 @@ def insert_user(db, name=None, email=None, password=None):
 
 
 def insert_items(
-    db, user_id, name, url, credentials, logo_url=None, description=None
+    db, owner_id, name, site, credentials, logo_url=None, description=None
 ):
     item = Item(
         id=uuid4(),
         name=name,
-        url=url,
+        site=site,
         logo_url=logo_url,
         description=description,
         credentials=credentials,
         added_at=datetime.now(),
         updated_at=None,
-        user_id=user_id,
+        owner_id=owner_id,
     )
     db.add(item)
     db.commit()

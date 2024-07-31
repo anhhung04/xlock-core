@@ -40,7 +40,7 @@ class UserTest(TestCase):
             db,
             u.id,
             name="test_item_name",
-            url="http://example.com",
+            site="http://example.com",
             credentials="test_credentials",
         )
         item_n_db = db.query(Item).filter(Item.id == item.id).first()

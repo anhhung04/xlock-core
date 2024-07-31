@@ -2,6 +2,7 @@ from fastapi import Depends, HTTPException
 from repository.item import ItemRepository
 from utils.http import UserSession
 from models.item import *
+from models.share_item import ShareItemModel
 from typing import List
 
 
@@ -28,12 +29,28 @@ class ItemService:
                 name=item.name,
                 site=item.site,
                 description=item.description,
-                credentials=item.credentials,
+                enc_credentials=item.credentials,
+                added_at=str(item.added_at),
+                type=item.type,
+                updated_at=str(item.updated_at) if item.updated_at else None,
+                logo_url=item.logo_url if item.logo_url else None
+            ).model_dump() 
+                if item.type == "personal_item" else 
+            ShareItemModel(
+                id=str(item.id),
+                name=item.name,
+                site=item.site,
+                description=item.description,
+                enc_credentials=item.credentials,
                 added_at=str(item.added_at),
                 type=item.type,
                 updated_at=str(item.updated_at) if item.updated_at else None,
                 logo_url=item.logo_url if item.logo_url else None,
-            ).model_dump() for item in items
+                shared_at=str(item.shared_at),
+                shared_by=str(item.shared_by),
+                enc_pri=item.private_key,
+            ).model_dump()
+                for item in items
         ]
         return items
 
@@ -47,7 +64,7 @@ class ItemService:
             name=item.name,
             site=item.site,
             description=item.description,
-            credentials=item.credentials,
+            enc_credentials=item.credentials,
             added_at=str(item.added_at),
             type=item.type,
             updated_at=str(item.updated_at) if item.updated_at else None,
@@ -64,7 +81,7 @@ class ItemService:
             name=item.name,
             site=item.site,
             description=item.description,
-            credentials=item.credentials,
+            enc_credentials=item.credentials,
             added_at=str(item.added_at),
             type=item.type,
             updated_at=str(item.updated_at) if item.updated_at else None,

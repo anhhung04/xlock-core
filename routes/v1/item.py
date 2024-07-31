@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, Query
 from services.item import ItemService
+from services.share_item import ShareService
+from typing import Optional
+from models.share_item import *
 from models.item import *
-
 from utils.http import *
 
 itemRouter = APIRouter()
@@ -13,7 +15,7 @@ async def list_items(
     service: ItemService = Depends(ItemService),
 ):
     return APIResponse.as_json(
-        200, "Items listed successfully", {"items": await service.list(site)}
+        200, "Items listed successfully", await service.list(site)
     )
 
 
@@ -23,7 +25,7 @@ async def create_item(
     service: ItemService = Depends(ItemService),
 ):
     return APIResponse.as_json(
-        201, "Item created successfully", {"item": await service.create(item)}
+        201, "Item created successfully", await service.create(item)
     )
 
 @itemRouter.patch("/update/{item_id}", tags=["Item"], response_model=ItemDetailResponse)
@@ -33,7 +35,7 @@ async def update_item(
     service: ItemService = Depends(ItemService),
 ):
     return APIResponse.as_json(
-        201, "Item updated successfully", {"item": await service.update(item_id, item)}
+        200, "Item updated successfully", await service.update(item_id, item)
     )
 
 @itemRouter.delete("/delete/{item_id}", tags=["Item"], response_model=DeleteItemResponse)
@@ -42,4 +44,25 @@ async def delete_item(
     service: ItemService = Depends(ItemService),
 ):
     await service.delete(item_id)
-    return APIResponse.as_json(201, "Item deleted successfully")
+    return APIResponse.as_json(
+        201, "Item deleted successfully", None
+    )
+
+@itemRouter.post("/share", tags=["Item"], response_model=ShareResponseModel)
+async def share_item(
+    share_req: ShareRequest,
+    service: ShareService = Depends(ShareService),
+):
+    return APIResponse.as_json(
+        200, "OK", await service.process(share_req)
+    )
+
+@itemRouter.post("/share/create", tags=["Item"], response_model=BaseResponseModel)
+async def create_shared_item(
+    item: CreateShareItem,
+    service: ShareService = Depends(ShareService),
+):
+    await service.create(item)
+    return APIResponse.as_json(
+        201, "Shared item created successfully", None
+    )

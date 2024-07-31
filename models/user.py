@@ -89,7 +89,7 @@ class QueryUserModel(BaseModel):
 
     @model_validator(mode="after")
     def check_null(cls, values):
-        if not any(values.values()):
+        if not any(values.model_dump().values()):
             raise ValueError("At least one field must be filled")
         return values
 

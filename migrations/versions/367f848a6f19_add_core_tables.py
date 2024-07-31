@@ -160,10 +160,15 @@ def upgrade() -> None:
         "shared_items",
         sa.Column("item_id", sa.Uuid(), nullable=False),
         sa.Column("private_key", sa.String(), nullable=False),
-        sa.Column("shared_time", sa.DateTime(), nullable=False),
+        sa.Column("shared_at", sa.DateTime(), nullable=False),
+        sa.Column("shared_by", sa.Uuid(), nullable=False),
         sa.ForeignKeyConstraint(
             ["item_id"],
             ["items.id"],
+        ),
+        sa.ForeignKeyConstraint(
+            ["shared_by"],
+            ["users.id"],
         ),
         sa.PrimaryKeyConstraint("item_id"),
     )

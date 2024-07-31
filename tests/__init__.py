@@ -13,7 +13,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app import app
-from repository import RedisStorage, Storage
+from repository import Storage
 from repository.schemas import Base
 from repository.schemas.item import Item
 from repository.schemas.user import User
@@ -71,7 +71,6 @@ def override_get_redis():
         pass
 
 
-app.dependency_overrides[RedisStorage.get] = override_get_redis
 app.dependency_overrides[Storage.get] = override_get_db
 
 client = TestClient(app)

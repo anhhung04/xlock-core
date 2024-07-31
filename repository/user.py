@@ -11,7 +11,7 @@ class UserRepository:
 
     async def add(self, newUser: CreateUserModel) -> User:
         newUser = User(
-            name=newUser.name,
+            username=newUser.username,
             email=newUser.email,
             password=newUser.password,
             fullname=newUser.fullname,
@@ -20,7 +20,7 @@ class UserRepository:
             phone_number=newUser.phone_number,
             country=newUser.country,
             gender=newUser.gender,
-            email2=newUser.email2,
+            backup_email=newUser.backup_email,
             key=CryptoKey(
                 public_key=newUser.rsa_key_pair.public,
                 private_key=newUser.rsa_key_pair.enc_pri,

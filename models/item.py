@@ -13,7 +13,7 @@ class CreateItemModel(BaseModel):
 class ItemModel(CreateItemModel):
     id: str
     added_at: str = Field(..., examples=["2024-08-16 00:00:00"], description="Date time in format YYYY-MM-DD HH:MM:SS")
-    type: str = Field(..., description="Type of item (personal-item / shared-item / base-item)", examples=["personal-item"])
+    type: str = Field(..., description="Type of item (personal-item / shared-item / group-item)", examples=["personal-item"])
     updated_at: Optional[str] = None
     logo_url: Optional[str] = None
 

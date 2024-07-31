@@ -10,15 +10,15 @@ class RSAKeyPair(BaseModel):
 
 class GetUserDetail(BaseModel):
     id: str
-    name: str
+    username: str
     email: EmailStr
-    email2: Optional[EmailStr] = None
+    backup_email: Optional[EmailStr] = None
     fullname: str
     dob: str
     address: str    
     phone_number: str
     country: str
-    gender: Optional[str] = None
+    gender: str
     created_at: str = Field(..., examples=["2024-08-16 00:00:00"], description="Date time in format YYYY-MM-DD HH:MM:SS")
     updated_at: Optional[str] = Field(default=None, examples=["2024-08-16 00:00:00"], description="Date time in format YYYY-MM-DD HH:MM:SS")
 
@@ -42,7 +42,7 @@ class UserDetailWithKeyResponse(BaseResponseModel):
     data: UserDetailWithKey
 
 class CreateUserModel(BaseModel):
-    name: str = Field(..., description="Display name of user", examples=["mr.xlock"])
+    username: str = Field(..., description="Display name of user", examples=["mr.xlock"])
     email: EmailStr
     password: str
     fullname: str = Field(..., description="Full name of user", examples=["John Doe"])
@@ -50,17 +50,17 @@ class CreateUserModel(BaseModel):
     address: str    
     phone_number: str
     country: str
-    gender: Optional[str] = None
-    email2: Optional[EmailStr] = None
+    gender: str 
+    backup_email: Optional[EmailStr] = None
     rsa_key_pair: RSAKeyPair
     
 class QueryUserModel(BaseModel):
-    name: Optional[str] = None
+    username: Optional[str] = None
     id: Optional[str] = None
     email: Optional[EmailStr] = None
 
 class UpdateUserModel(BaseModel):
-    name: Optional[str] = None
+    username: Optional[str] = None
     fullname: Optional[str] = None
     dob: Optional[date] = None
     address: Optional[str] = None

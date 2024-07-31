@@ -48,7 +48,7 @@ class AuthService:
         user = await self._repo.add(newUser)
         return GetUserDetail(
             id=str(user.id),
-            name=user.name,
+            username=user.username,
             email=user.email,
             created_at=str(user.created_at),
             updated_at=str(user.updated_at) if user.updated_at else None,
@@ -58,7 +58,7 @@ class AuthService:
             phone_number=user.phone_number,
             country=user.country,
             gender=user.gender,
-            email2=user.email2,
+            backup_email=user.backup_email,
         ).model_dump()
 
     async def gen_token(self, authInfo: UserAuth) -> dict[str, str]:
@@ -88,7 +88,7 @@ class AuthService:
         print(user.created_at)
         return GetUserDetail(
             id=str(user.id),
-            name=user.name,
+            username=user.username,
             email=user.email,
             created_at=str(user.created_at),
             updated_at=str(user.updated_at) if user.updated_at else None,
@@ -98,7 +98,7 @@ class AuthService:
             phone_number=user.phone_number,
             country=user.country,
             gender=user.gender,
-            email2=user.email2,
+            backup_email=user.backup_email,
         ).model_dump()
     
     async def update(self, id: str, userInfo: UpdateUserModel) -> dict[str, str]:
@@ -108,7 +108,7 @@ class AuthService:
             raise HTTPException(status_code=500, detail=str(e))
         return GetUserDetail(
             id=str(user.id),
-            name=user.name,
+            username=user.username,
             email=user.email,
             created_at=str(user.created_at),
             updated_at=str(user.updated_at) if user.updated_at else None,
@@ -118,7 +118,7 @@ class AuthService:
             phone_number=user.phone_number,
             country=user.country,
             gender=user.gender,
-            email2=user.email2,
+            backup_email=user.backup_email,
         ).model_dump()
     
     async def delete(self, id: str) -> None:

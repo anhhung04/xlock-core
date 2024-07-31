@@ -15,7 +15,7 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
-    name: Mapped[str] = mapped_column()
+    username: Mapped[str] = mapped_column(unique=True)
     email: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
@@ -27,8 +27,8 @@ class User(Base):
     address: Mapped[str] = mapped_column()
     phone_number: Mapped[str] = mapped_column()
     country: Mapped[str] = mapped_column()
-    gender: Mapped[Optional[str]] = mapped_column()
-    email2: Mapped[Optional[str]] = mapped_column(unique=True)
+    gender: Mapped[str] = mapped_column()
+    backup_email: Mapped[Optional[str]] = mapped_column()
     key: Mapped["CryptoKey"] = relationship(back_populates="user", cascade="all, delete-orphan")
     sessions: Mapped[List["SessionInfo"]] = relationship(cascade="all, delete-orphan")
     items: Mapped[List["Item"]] = relationship(back_populates="owner", cascade="all, delete-orphan")

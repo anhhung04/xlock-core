@@ -15,7 +15,7 @@ class ItemService:
         self._repo = repo
         self._user = session._user
 
-    async def list(self, site: str) -> List[dict[str, any]]:
+    async def list(self, site: str | None) -> List[dict[str, any]]:
         try:
             items = await self._repo.list(str(self._user.id), site)
         except Exception as e:

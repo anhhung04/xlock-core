@@ -9,7 +9,7 @@ itemRouter = APIRouter()
 
 @itemRouter.get("/", tags=["Item"], response_model=ItemListResponse)
 async def list_items(
-    site: str = Query(..., title="Site", description="Site name"),
+    site: Optional[str] = Query(None, title="Site", description="Site name"),
     service: ItemService = Depends(ItemService),
 ):
     return APIResponse.as_json(

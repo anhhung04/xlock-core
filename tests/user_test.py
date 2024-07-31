@@ -4,8 +4,7 @@ from unittest import TestCase
 from repository.schemas.item import Item
 from repository.schemas.user import User
 from tests import (
-    gen_password,
-    gen_username,
+    CredentialGenerator,
     insert_items,
     insert_user,
     override_get_db,
@@ -15,8 +14,8 @@ from tests import (
 class UserTest(TestCase):
     def test_insert_user(self):
         db = next(override_get_db())
-        password = gen_password()
-        name = gen_username()
+        password = CredentialGenerator.gen_password()
+        name = CredentialGenerator.gen_username()
         email = f"{name}@example.com"
         u = insert_user(db, name, email, password)
 
@@ -32,8 +31,8 @@ class UserTest(TestCase):
 
     def test_insert_items(self):
         db = next(override_get_db())
-        name = gen_username()
-        password = gen_password()
+        name = CredentialGenerator.gen_username()
+        password = CredentialGenerator.gen_password()
         email = f"{name}@example.com"
         u = insert_user(db, name, email, password)
         item = insert_items(

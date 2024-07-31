@@ -1,5 +1,3 @@
-import json
-import os
 import random
 import string
 from datetime import datetime, timezone
@@ -17,16 +15,6 @@ from repository import Storage
 from repository.schemas import Base
 from repository.schemas.item import Item
 from repository.schemas.user import User
-
-file_path = os.path.join(os.path.dirname(__file__), "data.json")
-try:
-    with open(file_path, "r", errors="replace") as file:
-        data = json.load(file)
-        USER_DB = data["users"]
-except FileNotFoundError:
-    raise FileNotFoundError(f"File not found: {file_path}")
-except json.JSONDecodeError as e:
-    raise ValueError(f"Error decoding JSON from file {file_path}: {str(e)}")
 
 SQLALCHEMY_DATABASE_URL = "sqlite://"
 
@@ -64,14 +52,16 @@ def override_get_db():
         db.close()
 
 
-def override_get_redis():
+def override_get_store():
     try:
         yield RedisLocal()
     finally:
         pass
 
 
-app.dependency_overrides[Storage.get] = override_get_db
+app.dependency_overrides[Storage.get_db] = override_get_db
+app.dependency_overrides[Storage.get_store] = override_get_store
+
 
 client = TestClient(app)
 
@@ -92,17 +82,20 @@ class TestIntegration(TestCase):
         return self._base + self._route + path
 
 
-def gen_username():
-    return "".join(random.choices(string.ascii_lowercase, k=10))
+class CredentialGenerator:
+    def __init__(self, length=10):
+        self.length = length
 
+    def gen_username(self):
+        return "".join(random.choices(string.ascii_lowercase, k=self.length))
 
-def gen_password():
-    return "".join(random.choices(string.ascii_lowercase, k=10))
+    def gen_password(self):
+        return "".join(random.choices(string.ascii_lowercase, k=self.length))
 
 
 def create_user(name=None, email=None, password=None):
-    u = name or gen_username()
-    p = password or gen_password()
+    u = name or CredentialGenerator.gen_username()
+    p = password or CredentialGenerator.gen_password()
     id = uuid4()
     user = User(
         id=id,

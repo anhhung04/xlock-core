@@ -46,7 +46,11 @@ class ItemService:
 
     async def create(self, item: CreateItemModel) -> dict[str, str]:
         try:
-            item = await self._repo.add(item, str(self._user.id))
+            personalItem = PersonalItem(
+                **item.model_dump(),
+                owner_id=str(self._user.id),
+            )
+            item = await self._repo.add(personalItem)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         return jsonable_encoder(ItemModel.model_validate(item, strict=False, from_attributes=True))

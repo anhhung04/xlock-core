@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_validator, Field
+from pydantic import BaseModel, Field
 from typing import Optional
 from models.response import BaseResponseModel
 from datetime import datetime

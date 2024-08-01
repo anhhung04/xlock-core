@@ -6,7 +6,6 @@ from pydantic import (
     BaseModel,
     EmailStr,
     Field,
-    field_validator,
     model_validator,
 )
 
@@ -41,12 +40,6 @@ class GetUserDetail(BaseModel):
         description="Date time in format YYYY-MM-DD HH:MM:SS",
     )
 
-    # @field_validator("created_at", "updated_at", mode="after")
-    # def time_format(cls, v):
-    #     if v is None:
-    #         return None
-    #     dt = datetime.strptime(v, "%Y-%m-%d %H:%M:%S.%f")
-    #     return dt.strftime("%Y-%m-%d %H:%M:%S")
     class Config:
         json_encoders = {
             datetime: lambda v: v.strftime("%Y-%m-%d %H:%M:%S"),

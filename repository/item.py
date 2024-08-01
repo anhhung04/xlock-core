@@ -19,19 +19,15 @@ class ItemRepository:
             raise Exception(e)
         return items
 
-    async def add(self, item: CreateItemModel, user_id: str) -> PersonalItem:
+    async def add(self, item: PersonalItem | SharedItem) -> PersonalItem | SharedItem:
         try:
-            personalItem = PersonalItem(
-                **item.model_dump(),
-                owner_id=user_id,
-            )
-            self._sess.add(personalItem)
+            self._sess.add(item)
             self._sess.commit()
-            self._sess.refresh(personalItem)
+            self._sess.refresh(item)
         except Exception as e:
             self._sess.rollback()
             raise Exception(e)
-        return personalItem
+        return item
     
     async def update(self, item_id: str, item: UpdateItemModel) -> PersonalItem | SharedItem:
         try:
@@ -65,18 +61,3 @@ class ItemRepository:
         except Exception as e:
             raise Exception(e)
         return item
-    
-    async def add_share(self, item: AddShareItem, user_id: str, recipient_id: str) -> SharedItem:
-        try:
-            sharedItem = SharedItem(
-                **item.model_dump(),
-                owner_id=recipient_id,
-                actor_id=user_id,
-            )
-            self._sess.add(sharedItem)
-            self._sess.commit()
-            self._sess.refresh(sharedItem)
-        except Exception as e:
-            self._sess.rollback()
-            raise Exception(e)
-        return sharedItem

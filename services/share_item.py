@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException
 
 from repository.user import UserRepository
-from repository.item import ItemRepository
+from repository.item import ItemRepository, SharedItem
 
 from models.user import *
 from models.share_item import *
@@ -42,15 +42,17 @@ class ShareService:
             if not recipient:
                 raise HTTPException(status_code=400, detail="User not found")
             itemDB = await self._item_repo.get(item.item_id)
-            item = AddShareItem(
+            sharedItem = SharedItem(
                 name=itemDB.name,
                 site=itemDB.site,
                 description=itemDB.description,
                 enc_credentials=item.enc_credentials,
                 enc_pri=recipient.key.enc_pri,
                 logo_url=itemDB.logo_url,
+                owner_id=str(recipient.id),
+                actor_id=str(self._user.id)
             )
-            await self._item_repo.add_share(item, str(self._user.id), str(recipient.id))
+            await self._item_repo.add(sharedItem)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         return None

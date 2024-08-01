@@ -4,6 +4,7 @@ from utils.http import UserSession
 from models.item import *
 from models.share_item import ShareItemModel
 from typing import List
+from fastapi.encoders import jsonable_encoder
 
 
 class ItemService:
@@ -24,32 +25,9 @@ class ItemService:
         if items is None:
             return []
         items = [
-            ItemModel(
-                id=str(item.id),
-                name=item.name,
-                site=item.site,
-                description=item.description,
-                enc_credentials=item.credentials,
-                added_at=str(item.added_at),
-                type=item.type,
-                updated_at=str(item.updated_at) if item.updated_at else None,
-                logo_url=item.logo_url if item.logo_url else None
-            ).model_dump() 
+            jsonable_encoder(ItemModel.model_validate(item, strict=False, from_attributes=True))
                 if item.type == "personal_item" else 
-            ShareItemModel(
-                id=str(item.id),
-                name=item.name,
-                site=item.site,
-                description=item.description,
-                enc_credentials=item.credentials,
-                added_at=str(item.added_at),
-                type=item.type,
-                updated_at=str(item.updated_at) if item.updated_at else None,
-                logo_url=item.logo_url if item.logo_url else None,
-                shared_at=str(item.shared_at),
-                shared_by=str(item.shared_by),
-                enc_pri=item.private_key,
-            ).model_dump()
+            jsonable_encoder(ShareItemModel.model_validate(item, strict=False, from_attributes=True))
                 for item in items
         ]
         return items
@@ -59,34 +37,17 @@ class ItemService:
             item = await self._repo.add(item, str(self._user.id))
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
-        return ItemModel(
-            id=str(item.id),
-            name=item.name,
-            site=item.site,
-            description=item.description,
-            enc_credentials=item.credentials,
-            added_at=str(item.added_at),
-            type=item.type,
-            updated_at=str(item.updated_at) if item.updated_at else None,
-            logo_url=item.logo_url if item.logo_url else None,
-        ).model_dump()
+        return jsonable_encoder(ItemModel.model_validate(item, strict=False, from_attributes=True))
 
     async def update(self, id: str, item: UpdateItemModel) -> dict[str, str]:
         try:
             item = await self._repo.update(id, item)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
-        return ItemModel(
-            id=str(item.id),
-            name=item.name,
-            site=item.site,
-            description=item.description,
-            enc_credentials=item.credentials,
-            added_at=str(item.added_at),
-            type=item.type,
-            updated_at=str(item.updated_at) if item.updated_at else None,
-            logo_url=item.logo_url if item.logo_url else None,
-        ).model_dump()
+        if item.type == "personal_item":
+            return jsonable_encoder(ItemModel.model_validate(item, strict=False, from_attributes=True))
+        else:
+            return jsonable_encoder(ShareItemModel.model_validate(item, strict=False, from_attributes=True))
     
     async def delete(self, id: str) -> None:
         try:

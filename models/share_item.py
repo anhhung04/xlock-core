@@ -3,10 +3,11 @@ from models.user import QueryUserModel
 from models.item import ItemModel, CreateItemModel
 from typing import List
 from models.response import BaseResponseModel
-
+from datetime import datetime
+from uuid import UUID
 
 class ShareRequest(BaseModel):
-    item_id: str
+    item_id: UUID
     recipient: QueryUserModel = Field(
         ...,
         description="info of object be shared with",
@@ -24,7 +25,7 @@ class ShareResponse(BaseModel):
 
 
 class CreateShareItem(BaseModel):
-    item_id: str
+    item_id: UUID
     enc_credentials: str = Field(
         ..., description=("encrypted by public key of recipient")
     )
@@ -39,9 +40,14 @@ class AddShareItem(CreateItemModel):
 
 class ShareItemModel(ItemModel):
     enc_pri: str
-    shared_at: str
-    shared_by: str
+    shared_at: datetime = Field(..., examples=["2024-08-16 00:00:00"], description="Date time in format YYYY-MM-DD HH:MM:SS")
+    shared_by: UUID
     type: str = Field(..., examples=["shared-item"])
+
+    class Config:
+        json_encoders = {
+            datetime: lambda v: v.strftime("%Y-%m-%d %H:%M:%S"),
+        }
 
 class ItemListResponse(BaseResponseModel):
     data: List[ItemModel | ShareItemModel]

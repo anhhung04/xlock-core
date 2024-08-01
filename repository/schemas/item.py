@@ -20,7 +20,7 @@ class Item(Base):
     logo_url: Mapped[Optional[str]] = mapped_column()
     description: Mapped[Optional[str]] = mapped_column()
     type: Mapped[str] = mapped_column()
-    credentials: Mapped[str] = mapped_column()
+    enc_credentials: Mapped[str] = mapped_column()
     added_at: Mapped[datetime] = mapped_column(
         default=datetime.now(timezone.utc)
     )
@@ -55,7 +55,7 @@ class SharedItem(Item):
     item_id: Mapped[UUID] = mapped_column(
         ForeignKey("items.id"), primary_key=True, default=UUID
     )
-    private_key: Mapped[str] = mapped_column()
+    enc_pri: Mapped[str] = mapped_column()
     shared_at: Mapped[datetime] = mapped_column(
         default=datetime.now(timezone.utc)
     )

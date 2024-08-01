@@ -22,10 +22,7 @@ class ItemRepository:
     async def add(self, item: CreateItemModel, user_id: str) -> PersonalItem:
         try:
             personalItem = PersonalItem(
-                name=item.name,
-                site=item.site,
-                description=item.description,
-                credentials=item.enc_credentials,
+                **item.model_dump(),
                 owner_id=user_id,
             )
             self._sess.add(personalItem)
@@ -72,12 +69,8 @@ class ItemRepository:
     async def add_share(self, item: AddShareItem, user_id: str, recipient_id: str) -> SharedItem:
         try:
             sharedItem = SharedItem(
-                name=item.name,
-                site=item.site,
-                description=item.description,
-                credentials=item.enc_credentials,
+                **item.model_dump(),
                 owner_id=recipient_id,
-                private_key=item.enc_pri,
                 shared_by=user_id,
             )
             self._sess.add(sharedItem)

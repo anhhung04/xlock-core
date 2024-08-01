@@ -31,8 +31,8 @@ class ShareService:
             raise HTTPException(status_code=400, detail="Cannot share with yourself")
         return ShareResponse(
             type=item.type,
-            enc_credentials=item.credentials,
-            enc_pri=user.key.private_key,
+            enc_credentials=item.enc_credentials,
+            enc_pri=user.key.enc_pri,
             recipient_pub=user.key.public_key,
         ).model_dump()
     
@@ -47,7 +47,7 @@ class ShareService:
                 site=itemDB.site,
                 description=itemDB.description,
                 enc_credentials=item.enc_credentials,
-                enc_pri=recipient.key.private_key,
+                enc_pri=recipient.key.enc_pri,
                 logo_url=itemDB.logo_url,
             )
             await self._item_repo.add_share(item, str(self._user.id), str(recipient.id))

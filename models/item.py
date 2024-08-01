@@ -2,6 +2,7 @@ from pydantic import BaseModel, field_validator, Field
 from typing import Optional
 from models.response import BaseResponseModel
 from datetime import datetime
+from uuid import UUID
 
 class CreateItemModel(BaseModel):
     name: str = Field(..., examples=["Facebook"])
@@ -11,17 +12,15 @@ class CreateItemModel(BaseModel):
     logo_url: Optional[str] = None
 
 class ItemModel(CreateItemModel):
-    id: str
-    added_at: str = Field(..., examples=["2024-08-16 00:00:00"], description="Date time in format YYYY-MM-DD HH:MM:SS")
+    id: UUID
+    added_at: datetime = Field(..., examples=["2024-08-16 00:00:00"], description="Date time in format YYYY-MM-DD HH:MM:SS")
     type: str = Field(..., description="Type of item (personal_item / shared_item / group_item)", examples=["personal-item"])
-    updated_at: Optional[str] = None
+    updated_at: Optional[datetime] = Field(None, examples=["2024-08-16 00:00:00"], description="Date time in format YYYY-MM-DD HH:MM:SS")
 
-    @field_validator("added_at", "updated_at", "shared_at", mode="after", check_fields=False)
-    def time_format(cls, v):
-        if v is None:
-            return None
-        dt = datetime.strptime(v, "%Y-%m-%d %H:%M:%S.%f")
-        return dt.strftime("%Y-%m-%d %H:%M:%S")
+    class Config:
+        json_encoders = {
+            datetime: lambda v: v.strftime("%Y-%m-%d %H:%M:%S"),
+        }
 
 
 class ItemDetailResponse(BaseResponseModel):

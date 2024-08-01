@@ -6,6 +6,7 @@ from repository.item import ItemRepository, SharedItem
 from models.user import *
 from models.share_item import *
 from models.item import *
+
 from utils.http import *
 
 class ShareService:
@@ -22,7 +23,7 @@ class ShareService:
     async def process(self, req: ShareRequest) -> dict[str, str]:
         try:
             item = await self._item_repo.get(req.item_id)
-            user = await self._user_repo.get(req.recipient)
+            user = await self._user_repo.get(QueryUserModel(**req.validate_recipient()))
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         if not item or not user:
@@ -38,7 +39,7 @@ class ShareService:
     
     async def create(self, item: CreateShareItem) -> None:
         try:
-            recipient = await self._user_repo.get(item.recipient)
+            recipient = await self._user_repo.get(QueryUserModel(**item.validate_recipient()))
             if not recipient:
                 raise HTTPException(status_code=400, detail="User not found")
             itemDB = await self._item_repo.get(item.item_id)

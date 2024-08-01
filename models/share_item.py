@@ -1,19 +1,31 @@
-from pydantic import Field, BaseModel
-from models.user import QueryUserModel
+from pydantic import Field, BaseModel, EmailStr
+
 from models.item import ItemModel, CreateItemModel
-from typing import List
 from models.response import BaseResponseModel
+
 from datetime import datetime
+from typing import List
 from uuid import UUID
 
-class ShareRequest(BaseModel):
-    item_id: UUID
-    recipient: QueryUserModel = Field(
-        ...,
-        description="info of object be shared with",
-        examples=[{"email": "user1@gmail.com"}],
-    )
+from utils.validate import ValidateInput
 
+class BaseShareModel(BaseModel):
+    item_id: UUID
+    recipient: EmailStr | UUID | str = Field(..., description="email; id; username of recipient (must be 1 in 3)")
+
+    def validate_recipient(self) -> dict[str, str]:
+        input = self.recipient
+        if ValidateInput.is_email(input):
+            return {"email": input}
+        elif ValidateInput.is_uuid(input):
+            return {"id": input}
+        elif isinstance(input, str):
+            return {"username": input}
+        else:
+            raise ValueError("Invalid recipient input")
+
+class ShareRequest(BaseShareModel):
+    pass
 
 class ShareResponse(BaseModel):
     type: str = Field(..., examples=["shared_item"])
@@ -23,16 +35,9 @@ class ShareResponse(BaseModel):
     enc_pri: str = Field(..., description=("encrypted by pass of owner"))
     recipient_pub: str
 
-
-class CreateShareItem(BaseModel):
-    item_id: UUID
+class CreateShareItem(BaseShareModel):
     enc_credentials: str = Field(
         ..., description=("encrypted by public key of recipient")
-    )
-    recipient: QueryUserModel = Field(
-        ...,
-        description="username | email | id of recipient (must be 1 in 3)",
-        examples=[{"email": "user1@gmail.com"}],
     )
 
 class AddShareItem(CreateItemModel):

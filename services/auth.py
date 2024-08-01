@@ -1,14 +1,17 @@
 from fastapi import Depends
 from fastapi.exceptions import HTTPException
+from fastapi.encoders import jsonable_encoder
+
 from repository.user import UserRepository
 from repository import Storage
+
 from models.user import *
-from models.auth import *  
+from models.auth import * 
+ 
 from hashlib import pbkdf2_hmac
 from config import config
 from utils.http import JWTHandler
-from uuid import UUID
-from fastapi.encoders import jsonable_encoder
+
 
 
 class PasswordProcesser:

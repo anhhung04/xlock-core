@@ -38,19 +38,29 @@ class CreateShareItem(BaseModel):
 class AddShareItem(CreateItemModel):
     enc_pri: str = Field(..., description=("encrypted by pass of owner"))
 
+class ShareItemActor(BaseModel):
+    id: str
+    username: str
+    email: str
+
 class ShareItemModel(ItemModel):
     enc_pri: str
     shared_at: datetime = Field(..., examples=["2024-08-16 00:00:00"], description="Date time in format YYYY-MM-DD HH:MM:SS")
-    shared_by: UUID
-    type: str = Field(..., examples=["shared-item"])
+    type: str = Field(..., examples=["shared_item"])
 
     class Config:
         json_encoders = {
             datetime: lambda v: v.strftime("%Y-%m-%d %H:%M:%S"),
         }
 
+class ShareItemElement(ItemModel):
+    enc_credentials: str
+    shared_at: datetime = Field(..., examples=["2024-08-16 00:00:00"], description="Date time in format YYYY-MM-DD HH:MM:SS")
+    type: str = Field(..., examples=["shared_item"])
+    shared_by: ShareItemActor
+
 class ItemListResponse(BaseResponseModel):
-    data: List[ItemModel | ShareItemModel]
+    data: List[ItemModel | ShareItemElement]
 
 class ShareResponseModel(BaseResponseModel):
     data: ShareResponse

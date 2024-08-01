@@ -59,7 +59,8 @@ class SharedItem(Item):
     shared_at: Mapped[datetime] = mapped_column(
         default=datetime.now(timezone.utc)
     )
-    shared_by: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    actor_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    actor: Mapped["User"] = relationship()
 
     __mapper_args__ = {
         "polymorphic_identity": "shared_item",

@@ -71,7 +71,7 @@ class ItemRepository:
             sharedItem = SharedItem(
                 **item.model_dump(),
                 owner_id=recipient_id,
-                shared_by=user_id,
+                actor_id=user_id,
             )
             self._sess.add(sharedItem)
             self._sess.commit()

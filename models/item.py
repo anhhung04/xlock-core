@@ -14,7 +14,7 @@ class CreateItemModel(BaseModel):
 class ItemModel(CreateItemModel):
     id: UUID
     added_at: datetime = Field(..., examples=["2024-08-16 00:00:00"], description="Date time in format YYYY-MM-DD HH:MM:SS")
-    type: str = Field(..., description="Type of item (personal_item / shared_item / group_item)", examples=["personal-item"])
+    type: str = Field(..., description="Type of item (personal_item / shared_item / group_item)", examples=["personal_item"])
     updated_at: Optional[datetime] = Field(None, examples=["2024-08-16 00:00:00"], description="Date time in format YYYY-MM-DD HH:MM:SS")
 
     class Config:

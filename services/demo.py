@@ -1,4 +1,4 @@
-from fastapi import Depends, Path
+from fastapi import Depends
 from utils.log import logger
 
 from repository.demo import DemoRepo

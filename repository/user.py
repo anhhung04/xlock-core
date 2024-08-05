@@ -1,7 +1,10 @@
 from fastapi import Depends
+
 from repository import Storage
 from repository.schemas.user import *
+
 from models.user import *
+
 from uuid import uuid4
 
 
@@ -23,7 +26,7 @@ class UserRepository:
             backup_email=newUser.backup_email,
             key=CryptoKey(
                 public_key=newUser.rsa_key_pair.public,
-                private_key=newUser.rsa_key_pair.enc_pri,
+                enc_pri=newUser.rsa_key_pair.enc_pri,
                 salt=newUser.rsa_key_pair.salt,
             )
         )

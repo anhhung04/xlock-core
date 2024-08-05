@@ -38,7 +38,7 @@ class CryptoKey(Base):
     __tablename__ = "crypto_keys"
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
-    private_key: Mapped[str] = mapped_column()
+    enc_pri: Mapped[str] = mapped_column()
     public_key: Mapped[str] = mapped_column()
     salt: Mapped[str] = mapped_column()
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))

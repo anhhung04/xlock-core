@@ -63,7 +63,7 @@ def upgrade() -> None:
     op.create_table(
         "crypto_keys",
         sa.Column("id", sa.Uuid(), nullable=False),
-        sa.Column("private_key", sa.String(), nullable=False),
+        sa.Column("enc_pri", sa.String(), nullable=False),
         sa.Column("public_key", sa.String(), nullable=False),
         sa.Column("salt", sa.String(), nullable=False),
         sa.Column("user_id", sa.Uuid(), nullable=False),
@@ -82,7 +82,7 @@ def upgrade() -> None:
         sa.Column("logo_url", sa.String(), nullable=True),
         sa.Column("description", sa.String(), nullable=True),
         sa.Column("type", sa.String(), nullable=False),
-        sa.Column("credentials", sa.String(), nullable=False),
+        sa.Column("enc_credentials", sa.String(), nullable=False),
         sa.Column("added_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
         sa.Column("owner_id", sa.Uuid(), nullable=False),
@@ -159,11 +159,16 @@ def upgrade() -> None:
     op.create_table(
         "shared_items",
         sa.Column("item_id", sa.Uuid(), nullable=False),
-        sa.Column("private_key", sa.String(), nullable=False),
-        sa.Column("shared_time", sa.DateTime(), nullable=False),
+        sa.Column("enc_pri", sa.String(), nullable=False),
+        sa.Column("shared_at", sa.DateTime(), nullable=False),
+        sa.Column("actor_id", sa.Uuid(), nullable=False),
         sa.ForeignKeyConstraint(
             ["item_id"],
             ["items.id"],
+        ),
+        sa.ForeignKeyConstraint(
+            ["actor_id"],
+            ["users.id"],
         ),
         sa.PrimaryKeyConstraint("item_id"),
     )

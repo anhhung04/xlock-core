@@ -1,13 +1,17 @@
 from fastapi import Depends
 from fastapi.exceptions import HTTPException
+from fastapi.encoders import jsonable_encoder
+
 from repository.user import UserRepository
 from repository import Storage
+
 from models.user import *
-from models.auth import *  
+from models.auth import * 
+ 
 from hashlib import pbkdf2_hmac
 from config import config
 from utils.http import JWTHandler
-from uuid import UUID
+
 
 
 class PasswordProcesser:
@@ -46,20 +50,7 @@ class AuthService:
             raise HTTPException(status_code=409, detail="User already exists")
         newUser.password = PasswordProcesser(newUser.password, config["SALT"]).hash()
         user = await self._repo.add(newUser)
-        return GetUserDetail(
-            id=str(user.id),
-            username=user.username,
-            email=user.email,
-            created_at=str(user.created_at),
-            updated_at=str(user.updated_at) if user.updated_at else None,
-            fullname=user.fullname,
-            dob=str(user.dob),
-            address=user.address,
-            phone_number=user.phone_number,
-            country=user.country,
-            gender=user.gender,
-            backup_email=user.backup_email,
-        ).model_dump()
+        return jsonable_encoder(GetUserDetail.model_validate(user, strict=False, from_attributes=True))
 
     async def gen_token(self, authInfo: UserAuth) -> dict[str, str]:
         try:
@@ -85,41 +76,14 @@ class AuthService:
             raise HTTPException(status_code=500, detail=str(e))
         if not user:
             raise HTTPException(status_code=404, detail="User does not exist")
-        print(user.created_at)
-        return GetUserDetail(
-            id=str(user.id),
-            username=user.username,
-            email=user.email,
-            created_at=str(user.created_at),
-            updated_at=str(user.updated_at) if user.updated_at else None,
-            fullname=user.fullname,
-            dob=str(user.dob),
-            address=user.address,
-            phone_number=user.phone_number,
-            country=user.country,
-            gender=user.gender,
-            backup_email=user.backup_email,
-        ).model_dump()
+        return jsonable_encoder(GetUserDetail.model_validate(user, strict=False, from_attributes=True))
     
     async def update(self, id: str, userInfo: UpdateUserModel) -> dict[str, str]:
         try:
             user = await self._repo.update(id, userInfo)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
-        return GetUserDetail(
-            id=str(user.id),
-            username=user.username,
-            email=user.email,
-            created_at=str(user.created_at),
-            updated_at=str(user.updated_at) if user.updated_at else None,
-            fullname=user.fullname,
-            dob=str(user.dob),
-            address=user.address,
-            phone_number=user.phone_number,
-            country=user.country,
-            gender=user.gender,
-            backup_email=user.backup_email,
-        ).model_dump()
+        return jsonable_encoder(GetUserDetail.model_validate(user, strict=False, from_attributes=True))
     
     async def delete(self, id: str) -> None:
         try:

@@ -57,7 +57,6 @@ class SharedItem(Item):
     item_id: Mapped[UUID] = mapped_column(
         ForeignKey("items.id"), primary_key=True, default=UUID
     )
-    enc_pri: Mapped[str] = mapped_column()
     shared_at: Mapped[datetime] = mapped_column(
         default=datetime.now(timezone.utc)
     )
@@ -76,6 +75,9 @@ class GroupItem(Item):
 
     item_id: Mapped[UUID] = mapped_column(
         ForeignKey("items.id"), primary_key=True
+    )
+    shared_at: Mapped[datetime] = mapped_column(
+        default=datetime.now(timezone.utc)
     )
     group_id: Mapped[UUID] = mapped_column(ForeignKey("groups.id"))
     group: Mapped["Group"] = relationship(back_populates="group_items")

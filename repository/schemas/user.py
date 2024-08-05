@@ -32,7 +32,7 @@ class User(Base):
 
     key: Mapped["CryptoKey"] = relationship(back_populates="user", cascade="all, delete-orphan")
     sessions: Mapped[List["SessionInfo"]] = relationship(cascade="all, delete-orphan")
-    original_items: Mapped[List["PersonalItem"]] = relationship(back_populates="owner", cascade="all, delete-orphan")
+    personal_items: Mapped[List["PersonalItem"]] = relationship(back_populates="owner", cascade="all, delete-orphan")
     shared_items: Mapped[List["SharedItem"]] = relationship(back_populates="owner", cascade="all, delete-orphan")
     groups: Mapped[List["UserInGroup"]] = relationship(back_populates="member", cascade="all, delete-orphan")
 
@@ -73,8 +73,7 @@ class Group(Base):
     created_at: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
     updated_at: Mapped[Optional[datetime]] = mapped_column()
     member_counts: Mapped[int] = mapped_column()
-    gr_prikey: Mapped[str] = mapped_column()
-    gr_pubkey: Mapped[str] = mapped_column()
+    public_key: Mapped[str] = mapped_column()
     members: Mapped[List["UserInGroup"]] = relationship(back_populates="group", cascade="all, delete-orphan")
     group_items: Mapped[List["GroupItem"]] = relationship(back_populates="group", cascade="all, delete-orphan")
 

@@ -46,12 +46,12 @@ jobs:
                   host: ${{ secrets.DEPLOY_SERVER_HOST }}
                   username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
                   key: ${{ secrets.DEPLOY_SERVER_SSH_KEY }}
-                  port: ${{ secrets.DEPLOY_SERVER_PORT }}
                   script: |
+                      cd xlock-workload
                       docker login ghcr.io -u ${{ github.repository_owner }} -p ${{ secrets.GITHUB_TOKEN }}
-                      docker compose pull
-                      docker compose down
-                      docker compose up -d --build
+                      docker compose -f docker-compose.backend.yml pull app
+                      docker compose -f docker-compose.backend.yml down app
+                      docker compose -f docker-compose.backend.yml up app -d --build
                       # Post deployment commands
                       docker system prune -f
                       docker logout ghcr.io

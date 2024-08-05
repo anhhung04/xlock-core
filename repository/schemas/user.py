@@ -1,5 +1,5 @@
 from repository.schemas import Base, Status
-from repository.schemas.item import Item
+from repository.schemas.item import PersonalItem, SharedItem, GroupItem
 
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from sqlalchemy import ForeignKey, UniqueConstraint, Enum as DBEnum
@@ -29,16 +29,19 @@ class User(Base):
     country: Mapped[str] = mapped_column()
     gender: Mapped[str] = mapped_column()
     backup_email: Mapped[Optional[str]] = mapped_column()
+
     key: Mapped["CryptoKey"] = relationship(back_populates="user", cascade="all, delete-orphan")
     sessions: Mapped[List["SessionInfo"]] = relationship(cascade="all, delete-orphan")
-    items: Mapped[List["Item"]] = relationship(back_populates="owner", cascade="all, delete-orphan")
+    original_items: Mapped[List["PersonalItem"]] = relationship(back_populates="owner", cascade="all, delete-orphan")
+    shared_items: Mapped[List["SharedItem"]] = relationship(back_populates="owner", cascade="all, delete-orphan")
+    groups: Mapped[List["UserInGroup"]] = relationship(back_populates="member", cascade="all, delete-orphan")
 
 
 class CryptoKey(Base):
     __tablename__ = "crypto_keys"
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
-    private_key: Mapped[str] = mapped_column()
+    enc_pri: Mapped[str] = mapped_column()
     public_key: Mapped[str] = mapped_column()
     salt: Mapped[str] = mapped_column()
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
@@ -70,17 +73,21 @@ class Group(Base):
     created_at: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
     updated_at: Mapped[Optional[datetime]] = mapped_column()
     member_counts: Mapped[int] = mapped_column()
-    members: Mapped[List["UserInGroup"]] = relationship()
-
+    gr_prikey: Mapped[str] = mapped_column()
+    gr_pubkey: Mapped[str] = mapped_column()
+    members: Mapped[List["UserInGroup"]] = relationship(back_populates="group", cascade="all, delete-orphan")
+    group_items: Mapped[List["GroupItem"]] = relationship(back_populates="group", cascade="all, delete-orphan")
 
 class UserInGroup(Base):
     __tablename__ = "users_in_groups"
 
-    user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    member_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), primary_key=True)
     group_id: Mapped[UUID] = mapped_column(ForeignKey("groups.id"), primary_key=True)
-    role: Mapped[str] = mapped_column()
+    is_owner: Mapped[bool] = mapped_column()
     joined_at: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
-    user: Mapped["User"] = relationship()
+    member: Mapped["User"] = relationship(back_populates="groups")
+    group: Mapped["Group"] = relationship(back_populates="members")
+    enc_pri: Mapped[str] = mapped_column()
 
 
 class Device(Base):

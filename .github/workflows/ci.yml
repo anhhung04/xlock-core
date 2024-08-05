@@ -38,7 +38,7 @@ jobs:
 
     deploy:
         runs-on: ubuntu-latest
-        if: github.event.pull_request.merged == true && success() && false
+        if: github.event.pull_request.merged == true && success()
         steps:
             - name: SSH into Server and Execute Commands
               uses: appleboy/ssh-action@master

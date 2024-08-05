@@ -5,10 +5,10 @@ from utils.http import APIResponse
 from utils.log import logger
 
 from config import config
-from routes.v1 import * 
+from routes.v1 import *
 
 
-app = FastAPI()
+app = FastAPI(root_path="/api")
 
 app.add_middleware(
     CORSMiddleware,
@@ -23,7 +23,7 @@ api_router.include_router(demo_router, tags=["Demo"], prefix="/demo")
 api_router.include_router(authRouter, tags=["Auth"], prefix="/auth")
 api_router.include_router(itemRouter, tags=["Item"], prefix="/items")
 
-app.include_router(api_router, prefix="/api", tags=["App API v1"])
+app.include_router(api_router, tags=["App API v1"])
 
 
 @app.exception_handler(HTTPException)

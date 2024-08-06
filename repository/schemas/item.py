@@ -20,15 +20,14 @@ class Item(Base):
     logo_url: Mapped[Optional[str]] = mapped_column()
     description: Mapped[Optional[str]] = mapped_column()
     type: Mapped[str] = mapped_column()
-    credentials: Mapped[str] = mapped_column()
+    enc_credentials: Mapped[str] = mapped_column()
     added_at: Mapped[datetime] = mapped_column(
         default=datetime.now(timezone.utc)
     )
     updated_at: Mapped[Optional[datetime]] = mapped_column(
         onupdate=datetime.now(timezone.utc)
     )
-    owner_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
-    owner: Mapped["User"] = relationship(back_populates="items")
+
     histories: Mapped[List["ItemHistory"]] = relationship(cascade="all, delete-orphan")
 
     __mapper_args__ = {
@@ -44,6 +43,9 @@ class PersonalItem(Item):
         ForeignKey("items.id"), primary_key=True
     )
 
+    owner_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    owner: Mapped["User"] = relationship(back_populates="personal_item")
+
     __mapper_args__ = {
         "polymorphic_identity": "personal_item",
     }
@@ -55,15 +57,34 @@ class SharedItem(Item):
     item_id: Mapped[UUID] = mapped_column(
         ForeignKey("items.id"), primary_key=True, default=UUID
     )
-    private_key: Mapped[str] = mapped_column()
-    shared_time: Mapped[datetime] = mapped_column(
+    shared_at: Mapped[datetime] = mapped_column(
         default=datetime.now(timezone.utc)
     )
+
+    owner_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    owner: Mapped["User"] = relationship(back_populates="shared_items")
+    actor_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    actor: Mapped["User"] = relationship()
 
     __mapper_args__ = {
         "polymorphic_identity": "shared_item",
     }
 
+class GroupItem(Item):
+    __tablename__ = "group_items"
+
+    item_id: Mapped[UUID] = mapped_column(
+        ForeignKey("items.id"), primary_key=True
+    )
+    shared_at: Mapped[datetime] = mapped_column(
+        default=datetime.now(timezone.utc)
+    )
+    group_id: Mapped[UUID] = mapped_column(ForeignKey("groups.id"))
+    group: Mapped["Group"] = relationship(back_populates="group_items")
+
+    __mapper_args__ = {
+        "polymorphic_identity": "group_item",
+    }
 
 class ItemHistory(Base):
     __tablename__ = "item_histories"
@@ -88,8 +109,9 @@ class SharingHistory(ItemHistory):
     history_id: Mapped[UUID] = mapped_column(
         ForeignKey("item_histories.id"), primary_key=True
     )
-    provider_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+
     recipient_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    shared_at: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
 
     __mapper_args__ = {
         "polymorphic_identity": "sharing_history",

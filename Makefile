@@ -45,7 +45,8 @@ down-dev:
 logs:
 	docker compose --profile dev logs -f
 
-dev: down-dev up-dev migrate-all
+dev: down-dev up-dev
+	make migrate-all
 	fastapi dev app.py --reload --host 0.0.0.0 --port 8000
 
 restart-server:

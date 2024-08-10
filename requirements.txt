@@ -26,3 +26,7 @@ typing_extensions==4.12.2
 urllib3==2.2.2
 uvicorn==0.30.3
 PyJWT
+pyyaml 
+ua-parser 
+user-agents
+alembic[tz]

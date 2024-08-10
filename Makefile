@@ -31,10 +31,10 @@ migrate-new:
 	alembic revision --autogenerate -m "$$message"
 
 migrate-all:
-	PYTHONPATH=./ alembic upgrade head
+	alembic upgrade head
 
 migrate-downgrade:
-	PYTHONPATH=./ alembic downgrade -1
+	alembic downgrade -1
 
 up-dev:
 	docker compose --profile dev up -d --build
@@ -45,12 +45,10 @@ down-dev:
 logs:
 	docker compose --profile dev logs -f
 
-dev: down-dev up-dev
-	POSTGRES_HOST=localhost REDIS_HOST=localhost \
+dev: down-dev up-dev migrate-all
 	fastapi dev app.py --reload --host 0.0.0.0 --port 8000
 
 restart-server:
-	POSTGRES_HOST=localhost REDIS_HOST=localhost \
 	fastapi dev app.py --reload --host 0.0.0.0 --port 8000
 
 

@@ -1,30 +1,61 @@
 from fastapi.responses import JSONResponse
-from fastapi import Depends, Cookie, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from repository import Storage
-from typing import Optional, Annotated
+from fastapi import HTTPException, status
 from redis import Redis
 from jwt import encode, decode
 from string import ascii_letters, digits
 from random import choices
-from repository.schemas.user import User
-from utils.log import logger
+from hashlib import pbkdf2_hmac
+from config import config
+import time
 
 
 class JWTHandler:
-    def __init__(self, secret_store: Redis):
+    def __init__(self, secret_store: Redis, expire: int = config["TOKEN_EXPIRE"]):
         self._secret_store = secret_store
+        self._expire = expire
 
-    def gen(self, payload: dict) -> str:
-        assert "id" in payload, "Payload must contain id"
-        secret: str = ''.join(choices(ascii_letters + digits, k=64))
-        self._secret_store.set(payload["id"], secret)
+    def create_token(self, payload: dict) -> str:
+        if "id" not in payload:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Payload must contain 'id' field",
+            )
+        secret = self._secret_store.get(payload["id"])
+        if not secret:
+            secret = self.random_secret(64)
+            self._secret_store.set(payload["id"], secret, ex=self._expire)
+        secret = str(secret, "utf-8")
+        payload["iat"] = payload.get("iat", time.time() // 1000)
+        payload["issuer"] = payload.get("iss", "xlock")
         return encode(payload, secret, algorithm="HS256")
 
     def verify(self, token: str) -> dict:
         payload = decode(token, options={"verify_signature": False})
         secret = self._secret_store.get(payload["id"])
-        return decode(token, secret, algorithms="HS256")
+        try:
+            if not secret:
+                raise Exception("Cannot find secret")
+            return decode(token, str(secret, "utf-8"), algorithms=["HS256"])
+        except Exception:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token is invalid or expired",
+            )
+
+    def revoke(self, token: str) -> None:
+        payload = decode(token, options={"verify_signature": False})
+        self._secret_store.delete(payload["id"])
+
+    def refresh(self, token: str) -> str:
+        payload = decode(token, options={"verify_signature": False})
+        return self.create_token(payload)
+
+    @staticmethod
+    def random_secret(lenght: int = 32) -> str:
+        alp = ascii_letters + digits
+        return pbkdf2_hmac(
+            "sha512", "".join(choices(alp, k=lenght)).encode(), b"", 100000
+        ).hex()
 
 
 class APIResponse:
@@ -37,27 +68,3 @@ class APIResponse:
         if data is not None:
             content.update({"data": data})
         return JSONResponse(content=content, status_code=status_code)
-
-header = HTTPBearer(
-    auto_error=False,
-    scheme_name="Bearer",
-)
-
-class UserSession:
-    def __init__(
-        self,
-        storage: Storage = Depends(Storage),
-        auth_cookie: Annotated[str | None, Cookie(..., alias="auth")] = None,
-        auth_header: Annotated[HTTPAuthorizationCredentials, "Authorization header"] = Depends(header),
-    ):
-        try:
-            self._token = auth_cookie or auth_header.credentials            
-            self._db = storage._db
-            self._jwt = JWTHandler(storage._fstore)
-            self._user_id = self._jwt.verify(self._token)["id"]
-            self._user = self._db.query(User).filter(User.id == self._user_id).first()
-        except Exception:
-            raise HTTPException(status_code=401, detail="Error in authorization")
-        if not self._user:
-            raise HTTPException(status_code=401, detail="Unauthorized")
-        

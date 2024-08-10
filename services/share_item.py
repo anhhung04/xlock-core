@@ -8,6 +8,8 @@ from models.share_item import *
 from models.item import *
 
 from utils.http import *
+from utils.session import *
+
 
 class ShareService:
     def __init__(
@@ -36,10 +38,12 @@ class ShareService:
             enc_pri=user.key.enc_pri,
             recipient_pub=user.key.public_key,
         ).model_dump()
-    
+
     async def create(self, item: CreateShareItem) -> None:
         try:
-            recipient = await self._user_repo.get(QueryUserModel(**item.validate_recipient()))
+            recipient = await self._user_repo.get(
+                QueryUserModel(**item.validate_recipient())
+            )
             if not recipient:
                 raise HTTPException(status_code=400, detail="User not found")
             itemDB = await self._item_repo.get(item.item_id)
@@ -51,14 +55,9 @@ class ShareService:
                 enc_pri=recipient.key.enc_pri,
                 logo_url=itemDB.logo_url,
                 owner_id=str(recipient.id),
-                actor_id=str(self._user.id)
+                actor_id=str(self._user.id),
             )
             await self._item_repo.add(sharedItem)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         return None
-
-
-
-    
-    

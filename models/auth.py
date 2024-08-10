@@ -1,10 +1,18 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, Field
 from models.response import BaseResponseModel
 
 
 class UserAuth(BaseModel):
-    email: EmailStr
-    password: str
+    identity: str = Field(
+        ..., description="User email or username", max_length=50, min_length=3
+    )
+    password: str = Field(
+        ...,
+        description="User password",
+        max_length=128,
+        min_length=8,
+        pattern="^[a-z0-9]+$",
+    )
 
 
 class VerifyTokenRequest(BaseModel):

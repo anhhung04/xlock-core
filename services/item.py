@@ -8,25 +8,32 @@ from models.item import *
 from models.share_item import *
 
 from typing import List
-from utils.http import UserSession
+from utils.session import UserSession
 
 
 def as_dict(item: PersonalItem | SharedItem) -> dict[str, any]:
     match item.type:
         case "personal_item":
-            return jsonable_encoder(ItemModel.model_validate(item, strict=False, from_attributes=True))
+            return jsonable_encoder(
+                ItemModel.model_validate(item, strict=False, from_attributes=True)
+            )
         case "shared_item":
-            itemDict = jsonable_encoder(ShareItemModel.model_validate(item, strict=False, from_attributes=True))
-            itemDict.update({
-                "shared_by": {
-                    "id": str(item.actor.id),
-                    "username": item.actor.username,
-                    "email": item.actor.email
+            itemDict = jsonable_encoder(
+                ShareItemModel.model_validate(item, strict=False, from_attributes=True)
+            )
+            itemDict.update(
+                {
+                    "shared_by": {
+                        "id": str(item.actor.id),
+                        "username": item.actor.username,
+                        "email": item.actor.email,
+                    }
                 }
-            })
+            )
             return itemDict
         case _:
             return {}
+
 
 class ItemService:
 
@@ -57,7 +64,9 @@ class ItemService:
             item = await self._repo.add(personalItem)
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
-        return jsonable_encoder(ItemModel.model_validate(item, strict=False, from_attributes=True))
+        return jsonable_encoder(
+            ItemModel.model_validate(item, strict=False, from_attributes=True)
+        )
 
     async def update(self, id: str, item: UpdateItemModel) -> dict[str, str]:
         try:
@@ -65,7 +74,7 @@ class ItemService:
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         return as_dict(item)
-    
+
     async def delete(self, id: str) -> None:
         try:
             await self._repo.delete(id)

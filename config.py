@@ -22,4 +22,5 @@ config = {
     "MAX_CONNECTIONS_REDIS": 20,
     "LOG_LEVEL": os.getenv("LOG_LEVEL", "INFO"),
     "SALT": os.getenv("PASSWORD_SALT", "xlock-salt"),
+    "TOKEN_EXPIRE": os.getenv("TOKEN_EXPIRE", 86400),
 }

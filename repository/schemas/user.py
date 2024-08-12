@@ -1,4 +1,4 @@
-from repository.schemas import Base, Status
+from repository.schemas import Base, SessionType
 from repository.schemas.item import Item
 
 from sqlalchemy.orm import mapped_column, Mapped, relationship
@@ -29,9 +29,15 @@ class User(Base):
     country: Mapped[str] = mapped_column()
     gender: Mapped[str] = mapped_column()
     backup_email: Mapped[Optional[str]] = mapped_column()
-    key: Mapped["CryptoKey"] = relationship(back_populates="user", cascade="all, delete-orphan")
-    sessions: Mapped[List["SessionInfo"]] = relationship(cascade="all, delete-orphan")
-    items: Mapped[List["Item"]] = relationship(back_populates="owner", cascade="all, delete-orphan")
+    key: Mapped["CryptoKey"] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+    sessions: Mapped[List["SessionInfo"]] = relationship(
+        cascade="all, delete-orphan", back_populates="user"
+    )
+    items: Mapped[List["Item"]] = relationship(
+        back_populates="owner", cascade="all, delete-orphan"
+    )
 
 
 class CryptoKey(Base):
@@ -54,11 +60,13 @@ class SessionInfo(Base):
     time: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
     location: Mapped[str] = mapped_column()
     ip: Mapped[str] = mapped_column()
-    status: Mapped[str] = mapped_column(DBEnum(Status))
     user_agent: Mapped[str] = mapped_column()
     device_fk: Mapped[str] = mapped_column(ForeignKey("devices.id"))
     device: Mapped["Device"] = relationship()
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
+    user: Mapped["User"] = relationship(back_populates="sessions")
+    type: Mapped["SessionType"] = mapped_column(DBEnum(SessionType))
+    token: Mapped[str] = mapped_column()
 
 
 class Group(Base):
@@ -88,6 +96,6 @@ class Device(Base):
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     device_id: Mapped[UUID] = mapped_column(unique=True)
-    broswer: Mapped[str] = mapped_column()
+    browser: Mapped[str] = mapped_column()
     os: Mapped[str] = mapped_column()
     device_type: Mapped[str] = mapped_column()

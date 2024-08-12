@@ -1,4 +1,4 @@
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 
 from repository import Storage
 from repository.schemas.user import *
@@ -28,7 +28,7 @@ class UserRepository:
                 public_key=newUser.rsa_key_pair.public,
                 enc_pri=newUser.rsa_key_pair.enc_pri,
                 salt=newUser.rsa_key_pair.salt,
-            )
+            ),
         )
         try:
             self._sess.add(newUser)
@@ -36,34 +36,44 @@ class UserRepository:
             self._sess.refresh(newUser)
         except Exception as e:
             self._sess.rollback()
-            raise Exception(e)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Error while adding user",
+            )
         return newUser
 
     async def get(self, query: QueryUserModel) -> User:
+        existUser = None
         try:
             existUser = (
                 self._sess.query(User)
                 .filter_by(**query.model_dump(exclude_none=True))
                 .first()
             )
-        except Exception as e:
-            raise Exception(e)
+        except Exception:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found",
+            )
         return existUser
-    
+
     async def update(self, id: str, userInfo: UpdateUserModel) -> User:
         try:
             user = self._sess.query(User).filter(User.id == id).first()
             if user:
-                for key, value in userInfo.model_dump(exclude_none=True).items(): 
+                for key, value in userInfo.model_dump(exclude_none=True).items():
                     setattr(user, key, value)
                 self._sess.commit()
                 self._sess.refresh(user)
             else:
                 raise Exception("User not found")
         except Exception as e:
-            raise Exception(e)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Error while updating user",
+            )
         return user
-    
+
     async def delete(self, id: str) -> None:
         try:
             user = self._sess.query(User).filter(User.id == id).first()
@@ -74,7 +84,8 @@ class UserRepository:
                 raise Exception("User not found")
         except Exception as e:
             self._sess.rollback()
-            raise Exception(e)
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found",
+            )
         return None
-
-

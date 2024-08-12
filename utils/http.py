@@ -24,7 +24,7 @@ class JWTHandler:
         if not secret:
             secret = self.random_secret(64)
             self._secret_store.set(payload["id"], secret, ex=self._expire)
-        secret = str(secret, "utf-8")
+        secret = str(secret)
         payload["iat"] = payload.get("iat", time.time() // 1000)
         payload["issuer"] = payload.get("iss", "xlock")
         return encode(payload, secret, algorithm="HS256")
@@ -35,7 +35,7 @@ class JWTHandler:
         try:
             if not secret:
                 raise Exception("Cannot find secret")
-            return decode(token, str(secret, "utf-8"), algorithms=["HS256"])
+            return decode(token, str(secret), algorithms=["HS256"])
         except Exception:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

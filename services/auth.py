@@ -47,10 +47,7 @@ class AuthService:
         self._user_sess = user_sess
 
     async def create(self, newUser: CreateUserModel) -> dict[str, str]:
-        try:
-            existUser = await self._repo.get(QueryUserModel(email=newUser.email))
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+        existUser = await self._repo.get(QueryUserModel(email=newUser.email))
         if existUser:
             raise HTTPException(status_code=409, detail="User already exists")
         newUser.password = PasswordProcesser(newUser.password, config["SALT"]).hash()
@@ -60,25 +57,18 @@ class AuthService:
         )
 
     async def gen_token(self, authInfo: UserAuth) -> dict[str, str]:
-        try:
-            if match(
-                authInfo.identity, r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
-            ):
-                query = QueryUserModel(email=authInfo.identity)
-            else:
-                query = QueryUserModel(username=authInfo.identity)
-            existUser = await self._repo.get(query)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+        if match(
+            r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$",
+            authInfo.identity,
+        ):
+            query = QueryUserModel(email=authInfo.identity)
+        else:
+            query = QueryUserModel(username=authInfo.identity)
+        existUser = await self._repo.get(query)
         if not existUser:
             raise HTTPException(status_code=404, detail="User does not exist")
         access_token = self._jwt.create_token({"id": str(existUser.id)})
-        self._user_sess = UserSession(
-            storage=self._user_sess._db,
-            device_detector=self._user_sess._device,
-            auth_cookie=access_token,
-            req=self._user_sess._req,
-        )
+        self._user_sess.attach(existUser, access_token)
         self._user_sess.log(SessionType.NEW)
         return AccessResponse(access_token=access_token).model_dump()
 

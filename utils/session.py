@@ -11,15 +11,19 @@ from utils.http import JWTHandler
 
 
 class DetectDevice:
+
     def __init__(
         self,
-        device_id: str = Cookie(None),
+        device_id: str = Cookie(
+            None,
+            pattern="^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        ),
         agent: str = Header(None, alias="User-Agent"),
     ):
         self._device_id: str = device_id
         if not self._device_id:
             raise HTTPException(status_code=400, detail="Device ID not found")
-        self._agent: UserAgent = parse(agent or "Unknown")
+        self._agent: UserAgent = parse(agent if agent else "Unknown")
 
     def device(self):
         device_info = {
@@ -54,14 +58,16 @@ class UserSession:
         auth_cookie: Annotated[str | None, Cookie(..., alias="auth")] = None,
         req: Request = None,
     ):
+        self._db = storage._db
+        self._jwt = JWTHandler(storage._fstore)
         self._req = req
+        self._device = device_detector.device()
+        self._user = None
+        self._token = None
         try:
             self._token = auth_cookie or auth_header.credentials
-            self._db = storage._db
-            self._jwt = JWTHandler(storage._fstore)
-            self._user_id = self._jwt.verify(self._token)["id"]
-            self._user = self._db.query(User).filter(User.id == self._user_id).first()
-            self._device = device_detector.device()
+            user_id = self._jwt.verify(self._token)["id"]
+            self._user = self._db.query(User).filter(User.id == user_id).first()
         except Exception:
             pass
         self._authorized = self._user is not None
@@ -81,7 +87,6 @@ class UserSession:
             self._db.refresh(exist_device)
         session = SessionInfo(
             user_id=self._user.id,
-            device_info=DetectDevice(self._req).device(),
             location="Unknown",
             ip=self._req.client.host,
             user_agent=self._req.headers["User-Agent"] or "Unknown",
@@ -93,3 +98,8 @@ class UserSession:
         self._db.commit()
         self._db.refresh(session)
         return session
+
+    def attach(self, user: User, token: str):
+        self._user = user
+        self._token = token
+        self._authorized = True

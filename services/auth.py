@@ -72,9 +72,16 @@ class AuthService:
             raise HTTPException(status_code=500, detail=str(e))
         if not existUser:
             raise HTTPException(status_code=404, detail="User does not exist")
+        access_token = self._jwt.create_token({"id": str(existUser.id)})
+        self._user_sess = UserSession(
+            storage=self._user_sess._db,
+            device_detector=self._user_sess._device,
+            auth_cookie=access_token
+            req=self._user_sess._req,
+        )
         self._user_sess.log(SessionType.NEW)
         return AccessResponse(
-            access_token=self._jwt.create_token({"id": str(existUser.id)})
+            access_token=access_token
         ).model_dump()
 
     async def verify(self, token: str) -> dict[str, bool]:

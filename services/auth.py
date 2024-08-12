@@ -55,7 +55,6 @@ class AuthService:
             raise HTTPException(status_code=409, detail="User already exists")
         newUser.password = PasswordProcesser(newUser.password, config["SALT"]).hash()
         user = await self._repo.add(newUser)
-        self._user_sess.log(SessionType.NEW)
         return jsonable_encoder(
             GetUserDetail.model_validate(user, strict=False, from_attributes=True)
         )

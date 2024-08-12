@@ -32,7 +32,9 @@ class User(Base):
     key: Mapped["CryptoKey"] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
-    sessions: Mapped[List["SessionInfo"]] = relationship(cascade="all, delete-orphan")
+    sessions: Mapped[List["SessionInfo"]] = relationship(
+        cascade="all, delete-orphan", back_populates="user"
+    )
     items: Mapped[List["Item"]] = relationship(
         back_populates="owner", cascade="all, delete-orphan"
     )
@@ -62,7 +64,7 @@ class SessionInfo(Base):
     device_fk: Mapped[str] = mapped_column(ForeignKey("devices.id"))
     device: Mapped["Device"] = relationship()
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
-    user: Mapped["User"] = relationship()
+    user: Mapped["User"] = relationship(back_populates="sessions")
     type: Mapped["SessionType"] = mapped_column(DBEnum(SessionType))
     token: Mapped[str] = mapped_column()
 

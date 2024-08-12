@@ -47,7 +47,7 @@ async def get_user(
     service: AuthService = Depends(AuthService),
     session: UserSession = Depends(UserSession),
 ):
-    user = await service.get(session._user_id)
+    user = await service.get(session._user.id)
     return APIResponse.as_json(200, "OK", user)
 
 
@@ -57,5 +57,5 @@ async def update_user(
     service: AuthService = Depends(AuthService),
     session: UserSession = Depends(UserSession),
 ):
-    user = await service.update(session._user_id, userInfo)
+    user = await service.update(session._user.id, userInfo)
     return APIResponse.as_json(200, "User updated successfully", user)

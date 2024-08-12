@@ -76,13 +76,11 @@ class AuthService:
         self._user_sess = UserSession(
             storage=self._user_sess._db,
             device_detector=self._user_sess._device,
-            auth_cookie=access_token
+            auth_cookie=access_token,
             req=self._user_sess._req,
         )
         self._user_sess.log(SessionType.NEW)
-        return AccessResponse(
-            access_token=access_token
-        ).model_dump()
+        return AccessResponse(access_token=access_token).model_dump()
 
     async def verify(self, token: str) -> dict[str, bool]:
         return IsValidToken(is_valid=self._jwt.verify(token) is not None).model_dump()

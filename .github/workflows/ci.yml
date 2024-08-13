@@ -48,7 +48,7 @@ jobs:
                   username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
                   key: ${{ secrets.DEPLOY_SERVER_SSH_KEY }}
                   script: |
-                      cd xlock-workload
+                      cd xlock-workload/backend
                       docker login ghcr.io -u ${{ github.repository_owner }} -p ${{ secrets.GITHUB_TOKEN }}
                       docker compose -f docker-compose.backend.yml pull app
                       docker compose -f docker-compose.backend.yml down app

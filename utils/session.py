@@ -105,7 +105,7 @@ class UserSession:
         self._token = token
         self._authorized = True
 
-    def get_authorized_user_id(self) -> str:
-        if not self._authorized:
+    def get_authorized_user_id(self, is_allowed: str = True) -> str:
+        if not self._authorized or not is_allowed:
             return None
         return str(self._user.id)

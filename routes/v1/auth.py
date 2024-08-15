@@ -75,6 +75,6 @@ async def get_keys(
     caller_id = user_session.get_authorized_user_id()
     if not caller_id:
         return APIResponse.as_json(401, "Unauthorized", None)
-    own_resource = subject == "me" 
+    own_resource = subject == "me" or subject == caller_id
     keys = await service.get_keys(caller_id if own_resource else subject, own_resource)
     return APIResponse.as_json(200, "OK", keys)

@@ -5,6 +5,7 @@ from models.auth import *
 
 from utils.http import *
 from utils.session import *
+from utils.validate import *
 
 authRouter = APIRouter(tags=["Auth"])
 
@@ -75,6 +76,12 @@ async def get_keys(
     caller_id = user_session.get_authorized_user_id()
     if not caller_id:
         return APIResponse.as_json(401, "Unauthorized", None)
-    own_resource = subject == "me" or subject == caller_id
-    keys = await service.get_keys(caller_id if own_resource else subject, own_resource)
+    if ValidateInput.is_uuid(subject):
+        own_resource = subject == caller_id
+    elif subject == "me":
+        own_resource = True
+        subject = caller_id
+    else:
+        return APIResponse.as_json(400, "Subject must be UUID or string me", None)
+    keys = await service.get_keys(subject, own_resource)
     return APIResponse.as_json(200, "OK", keys)

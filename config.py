@@ -8,7 +8,11 @@ config = {
     "HOST": "0.0.0.0",
     "workers": 4,
     "PROD": os.getenv("PROD", None),
-    "ALLOWED_HOSTS": ["*"],
+    "ALLOWED_HOSTS": [
+        "chrome-extension://oggondagbjepnifnnmcgdipgbemcimea",
+        "http://localhost:3000",
+        "http://185.111.159.172",
+    ],
     "ALLOWED_METHODS": ["*"],
     "POSTGRES_SQL_URL": (
         f"postgresql://{os.getenv('POSTGRES_USER', 'postgres')}:"

@@ -15,6 +15,7 @@ app.add_middleware(
     allow_origins=config["ALLOWED_HOSTS"],
     allow_credentials=True,
     allow_methods=config["ALLOWED_METHODS"],
+    allow_headers=["*"],
 )
 
 api_router = APIRouter(prefix="/v1")

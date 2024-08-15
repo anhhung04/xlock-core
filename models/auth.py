@@ -11,8 +11,7 @@ class UserAuth(BaseModel):
         ...,
         description="User password",
         max_length=128,
-        min_length=8,
-        pattern="^[a-z0-9]+$",
+        min_length=8
     )
 
 

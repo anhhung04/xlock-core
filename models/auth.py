@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from models.response import BaseResponseModel
+from typing import Optional
 
 
 class UserAuth(BaseModel):
@@ -33,3 +34,10 @@ class AccessResponse(BaseModel):
 
 class UserAuthResponse(BaseResponseModel):
     data: AccessResponse
+
+class CrytoKey(BaseModel):
+    public_key: str
+    enc_pri: Optional[str] = None
+
+class CrytoKeyResponse(BaseResponseModel):
+    data: CrytoKey

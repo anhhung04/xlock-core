@@ -94,3 +94,11 @@ class AuthService:
         return jsonable_encoder(
             GetUserDetail.model_validate(user, strict=False, from_attributes=True)
         )
+    
+    async def get_keys(self, user_id: str, own_resource: bool) -> dict[str, str]:
+        user = await self._repo.get(QueryUserModel(id=user_id))
+        if own_resource:
+            keys = CrytoKey(public_key=user.key.public_key, enc_pri=user.key.enc_pri).model_dump()
+        else:
+            keys = CrytoKey(public_key=user.key.public_key).model_dump()
+        return keys

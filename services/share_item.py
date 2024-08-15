@@ -22,23 +22,6 @@ class ShareService:
         self._item_repo = item_repo
         self._user = user._user
 
-    async def process(self, req: ShareRequest) -> dict[str, str]:
-        try:
-            item = await self._item_repo.get(req.item_id)
-            user = await self._user_repo.get(QueryUserModel(**req.validate_recipient()))
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
-        if not item or not user:
-            raise HTTPException(status_code=400, detail="Item or User not found")
-        if user.id == self._user.id:
-            raise HTTPException(status_code=400, detail="Cannot share with yourself")
-        return ShareResponse(
-            type=item.type,
-            enc_credentials=item.enc_credentials,
-            enc_pri=user.key.enc_pri,
-            recipient_pub=user.key.public_key,
-        ).model_dump()
-
     async def create(self, item: CreateShareItem) -> None:
         try:
             recipient = await self._user_repo.get(
@@ -47,6 +30,8 @@ class ShareService:
             if not recipient:
                 raise HTTPException(status_code=400, detail="User not found")
             itemDB = await self._item_repo.get(item.item_id)
+            if not itemDB:
+                raise HTTPException(status_code=400, detail="Item not found")
             sharedItem = SharedItem(
                 name=itemDB.name,
                 site=itemDB.site,

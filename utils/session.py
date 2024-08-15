@@ -14,9 +14,10 @@ class DetectDevice:
 
     def __init__(
         self,
-        device_id: str = Cookie(
+        device_id: str = Header(
             None,
             pattern="^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            alias="X-Device-ID",
         ),
         agent: str = Header(None, alias="User-Agent"),
     ):

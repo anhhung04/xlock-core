@@ -48,15 +48,6 @@ async def delete_item(
         201, "Item deleted successfully", None
     )
 
-@itemRouter.post("/share", tags=["Item"], response_model=ShareResponseModel)
-async def share_item(
-    share_req: ShareRequest,
-    service: ShareService = Depends(ShareService),
-):
-    return APIResponse.as_json(
-        200, "OK", await service.process(share_req)
-    )
-
 @itemRouter.post("/share/create", tags=["Item"], response_model=BaseResponseModel)
 async def create_shared_item(
     item: CreateShareItem,

@@ -47,9 +47,10 @@ async def get_user(
     service: AuthService = Depends(AuthService),
     session: UserSession = Depends(UserSession),
 ):
-    if not session._user:
+    user_id = session.get_authorized_user_id()
+    if not user_id:
         return APIResponse.as_json(401, "Unauthorized", None)
-    user = await service.get(session._user.id)
+    user = await service.get(user_id)
     return APIResponse.as_json(200, "OK", user)
 
 
@@ -59,7 +60,21 @@ async def update_user(
     service: AuthService = Depends(AuthService),
     session: UserSession = Depends(UserSession),
 ):
-    if not session._user:
+    user_id = session.get_authorized_user_id()
+    if not user_id:
         return APIResponse.as_json(401, "Unauthorized", None)
-    user = await service.update(session._user.id, userInfo)
+    user = await service.update(user_id, userInfo)
     return APIResponse.as_json(200, "User updated successfully", user)
+
+@authRouter.get("/keys/{subject}", response_model=CrytoKeyResponse)
+async def get_keys(
+    subject: str,
+    service: AuthService = Depends(AuthService),
+    user_session: UserSession = Depends(UserSession),
+):
+    caller_id = user_session.get_authorized_user_id()
+    if not caller_id:
+        return APIResponse.as_json(401, "Unauthorized", None)
+    own_resource = subject == "me" 
+    keys = await service.get_keys(caller_id if own_resource else subject, own_resource)
+    return APIResponse.as_json(200, "OK", keys)

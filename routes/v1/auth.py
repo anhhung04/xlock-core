@@ -48,10 +48,10 @@ async def get_user(
     service: AuthService = Depends(AuthService),
     session: UserSession = Depends(UserSession),
 ):
-    user_id = session.get_authorized_user_id()
-    if not user_id:
+    user = session.get_authorized_user()
+    if not user:
         return APIResponse.as_json(401, "Unauthorized", None)
-    user = await service.get(user_id)
+    user = await service.get(user.id)
     return APIResponse.as_json(200, "OK", user)
 
 
@@ -61,10 +61,10 @@ async def update_user(
     service: AuthService = Depends(AuthService),
     session: UserSession = Depends(UserSession),
 ):
-    user_id = session.get_authorized_user_id()
-    if not user_id:
+    user = session.get_authorized_user()
+    if not user:
         return APIResponse.as_json(401, "Unauthorized", None)
-    user = await service.update(user_id, userInfo)
+    user = await service.update(user.id, userInfo)
     return APIResponse.as_json(200, "User updated successfully", user)
 
 @authRouter.get("/keys/{subject}", response_model=CrytoKeyResponse)
@@ -73,15 +73,15 @@ async def get_keys(
     service: AuthService = Depends(AuthService),
     user_session: UserSession = Depends(UserSession),
 ):
-    caller_id = user_session.get_authorized_user_id()
-    if not caller_id:
+    caller = user_session.get_authorized_user()
+    if not caller:
         return APIResponse.as_json(401, "Unauthorized", None)
-    if ValidateInput.is_uuid(subject):
-        own_resource = subject == caller_id
-    elif subject == "me":
-        own_resource = True
-        subject = caller_id
-    else:
-        return APIResponse.as_json(400, "Subject must be UUID or string me", None)
-    keys = await service.get_keys(subject, own_resource)
+    # if ValidateInput.is_email(subject):
+    #     own_resource = subject == caller.email
+    # elif subject == "me":
+    #     own_resource = True
+    #     subject = caller.id
+    # else:
+    #     own_resource = subject == caller.username
+    keys = await service.get_keys(subject)
     return APIResponse.as_json(200, "OK", keys)

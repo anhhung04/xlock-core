@@ -13,6 +13,7 @@ from hashlib import pbkdf2_hmac
 from config import config
 from utils.http import JWTHandler
 from utils.session import UserSession
+from utils.validate import ValidateInput
 
 from re import match
 
@@ -95,8 +96,18 @@ class AuthService:
             GetUserDetail.model_validate(user, strict=False, from_attributes=True)
         )
     
-    async def get_keys(self, user_id: str, own_resource: bool) -> dict[str, str]:
-        user = await self._repo.get(QueryUserModel(id=user_id))
+    async def get_keys(self, subject: str) -> dict[str, str]:
+        if ValidateInput.is_email(subject):
+            own_resource = subject == self._user_sess._user.email
+            user = await self._repo.get(QueryUserModel(email=subject))
+        elif subject == "me":
+            own_resource = True
+            user = self._user_sess._user
+        else:
+            own_resource = subject == self._user_sess._user.username
+            user = await self._repo.get(QueryUserModel(username=subject))
+        if not user:
+            raise HTTPException(status_code=404, detail="User does not exist")
         if own_resource:
             keys = CrytoKey(public_key=user.key.public_key, enc_pri=user.key.enc_pri).model_dump()
         else:
